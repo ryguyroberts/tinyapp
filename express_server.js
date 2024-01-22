@@ -57,8 +57,14 @@ app.post("/urls", (req, res) => {
   let sixString = generateRandomString();
   urlDatabase[sixString] = req.body.longURL;
   res.redirect(`/urls/${sixString}`);
-  // res.send("Ok"); // Respond with 'Ok' (we will replace this)
 });
+
+//Catch post and udpate the requested URL long value
+app.post("/urls/:id", (req, res) => {
+  urlDatabase[req.params.id] = req.body.longURL;
+  res.redirect("/urls");
+});
+
 
 
 // Redirect if u/shorturl (Only things in "DB" of course)
