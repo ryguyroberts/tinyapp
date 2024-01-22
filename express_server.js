@@ -39,6 +39,20 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+
+// Page for unique shortened URLS
+app.get("/urls/:id", (req, res) => {
+  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
+  res.render("urls_show", templateVars);
+});
+
+//Catch post and delete the requested URL ID
+app.post("/urls/:id/delete", (req, res) => {
+  delete urlDatabase[req.params.id];
+  res.redirect("/urls");
+});
+
+
 app.post("/urls", (req, res) => {
   let sixString = generateRandomString();
   urlDatabase[sixString] = req.body.longURL;
@@ -46,11 +60,6 @@ app.post("/urls", (req, res) => {
   // res.send("Ok"); // Respond with 'Ok' (we will replace this)
 });
 
-// Page for unique shortened URLS
-app.get("/urls/:id", (req, res) => {
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
-  res.render("urls_show", templateVars);
-});
 
 // Redirect if u/shorturl (Only things in "DB" of course)
 app.get("/u/:id", (req, res) => {
