@@ -23,7 +23,6 @@ const generateRandomString = () => {
   return randomString;
 };
 
-
 // Not sure if I need this anymore. But its the default get for root /
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -45,16 +44,24 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+app.post("/urls", (req, res) => {
+  const sixString = generateRandomString();
+  urlDatabase[sixString] = req.body.longURL;
+  res.redirect(`/urls/${sixString}`)
+  // res.send("Ok"); // Respond with 'Ok' (we will replace this)
+});
+
 // Page for unique shortened URLS
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
   res.render("urls_show", templateVars);
 })
 
-app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
-});
+// Redirect if u/shorturl (Only things in "DB" of course)
+app.get("/u/:id", (req, res) => {
+  redirURL = urlDatabase[req.params.id];
+  res.redirect(redirURL);
+})
 
 // Old code, was prolly just an example. 
 // app.get("/hello", (req, res) => {
