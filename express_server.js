@@ -60,7 +60,7 @@ app.get("/", (req, res) => {
 
 // Page of all URLS
 app.get("/urls", (req, res) => {
-  userName = req.cookies["user_id"]
+  let userName = req.cookies["user_id"]
   const templateVars = { urls: urlDatabase,
     user: users[userName],
   };
@@ -69,17 +69,22 @@ app.get("/urls", (req, res) => {
 
 // Page to make new URLS
 app.get("/urls/new", (req, res) => {
-  userName = req.cookies["user_id"];
-  const templateVars = {
-    user: users[userName]
-  };
-  res.render("urls_new", templateVars);
+  let userName = req.cookies["user_id"];
+  if (userName) {
+    const templateVars = {
+      user: users[userName]
+    };
+    return res.render("urls_new", templateVars);
+  // If not logged can't get here. 
+  } else {
+    return res.redirect("/login");
+  }
 });
 
 
 // Page for unique shortened URLS
 app.get("/urls/:id", (req, res) => {
-  userName = req.cookies["user_id"];
+  let userName = req.cookies["user_id"];
   const templateVars = { id: req.params.id,
     longURL: urlDatabase[req.params.id],
     user: users[userName],
@@ -89,7 +94,11 @@ app.get("/urls/:id", (req, res) => {
 
 // Page for registration
 app.get("/register", (req, res) => {
-  userName = req.cookies["user_id"];
+  let userName = req.cookies["user_id"];
+  // redirect to URL if loggged in
+  if (userName) {
+    return res.redirect("/urls");
+  }
   const templateVars = {
     user: users[userName],
   };
@@ -99,6 +108,10 @@ app.get("/register", (req, res) => {
 // Page for login
 app.get("/login", (req, res) => {
   userName = req.cookies["user_id"];
+  // redirect to URL if loggged in
+  if (userName) {
+    return res.redirect("/urls");
+  }
   const templateVars = {
     user: users[userName],
   };
@@ -111,11 +124,16 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls");
 });
 
-//Catch new URLs being created generat random 6 digit for now
+//Catch new URLs being created generate random 6 digit for now
 app.post("/urls", (req, res) => {
-  let sixString = generateRandomString();
-  urlDatabase[sixString] = req.body.longURL;
-  res.redirect(`/urls/${sixString}`);
+  userName = req.cookies["user_id"];
+  if (userName) {
+    let sixString = generateRandomString();
+    urlDatabase[sixString] = req.body.longURL;
+    return res.redirect(`/urls/${sixString}`);
+  } else {
+    res.status(403).send("You cannot add a new URL unless you are logged in");
+  }
 });
 
 //Catch post and update the requested URL long value
