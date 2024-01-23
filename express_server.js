@@ -3,6 +3,7 @@ const app = express();
 const cookieParser = require('cookie-parser')
 const PORT = 8080; // default port 8080
 
+// Config
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
@@ -132,9 +133,17 @@ app.post("/logout", (req, res) => {
 
 //Catch post register and create user in DB var
 app.post("/register", (req, res) => {
-  // If either email or pass empty 400 code.
+  // If either email or pass empty error code.
+  if (req.body.email === "" || req.body.password === "") {
+    return res.status(404).send("Error: Cannot have empty email or password values");
+  }
 
-  // If you register
+  // If you register with an email that already exists
+  if (findUser(req.body.email)) {
+    return res.status(404).send("Error: That email already exists as a user");
+  }
+
+  // If no errors gets here makes new user
   let id = generateRandomString();
   users[id] = {
     id: id,
@@ -143,6 +152,7 @@ app.post("/register", (req, res) => {
   };
   res.cookie("user_id", id);
   res.redirect("/urls"); //maybe use 'back' here eventually
+
 });
 
 // Redirect if u/shorturl (Only things in "DB" of course)
