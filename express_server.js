@@ -78,11 +78,16 @@ app.post("/urls/:id", (req, res) => {
   }
 });
 
-// Catch post and set a cookie
+// Catch post login and set a cookie
 app.post("/login", (req, res) => {
   res.cookie("username", req.body.username);
   res.redirect("/urls"); //maybe use 'back' here
+});
 
+// Catch post logout and remove cookie for username
+app.post("/logout", (req, res) => {
+  res.clearCookie("username")
+  res.redirect("/urls"); //maybe use 'back' here eventually
 });
 
 
