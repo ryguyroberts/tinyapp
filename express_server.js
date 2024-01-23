@@ -13,6 +13,21 @@ let urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// Users with some pre-populated example
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
+
+
 // Some functions that will exist here for now
 const generateRandomString = () => {
   // Might be a better way but this works.
@@ -99,6 +114,18 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls"); //maybe use 'back' here eventually
 });
 
+//Catch post register and create user in DB var
+app.post("/register", (req, res) => {
+  let id = generateRandomString();
+  users[id] = {
+    id: id,
+    email: req.body.email,
+    password: req.body.password
+  };
+  console.log(users);
+
+  res.redirect("/urls"); //maybe use 'back' here eventually
+});
 
 // Redirect if u/shorturl (Only things in "DB" of course)
 app.get("/u/:id", (req, res) => {
