@@ -30,6 +30,8 @@ const users = {
 
 
 // Some functions that will exist here for now
+
+// Generate 6digit id
 const generateRandomString = () => {
   // Might be a better way but this works.
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -127,16 +129,29 @@ app.post("/urls/:id", (req, res) => {
   }
 });
 
-// Catch post login and set a cookie // NOT UPDATED FOR LOGIN REFACTOR
+// Catch post login and set a cookie 
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username);
-  res.redirect("/urls"); //maybe use 'back' here
+  //Lookup object in DB
+  let user = findUser(req.body.email)
+  if (user) {
+    // Found user check P/W
+    if (user.password === req.body.password) {
+      res.cookie("user_id", user.id);
+      res.redirect("/urls"); //maybe use 'back' here
+    // Pw don't match
+    } else {
+      return res.status(403).send("Error: Password doesn't match");
+    }
+  // No user found error
+  } else {
+    return res.status(403).send("Error: That user email was not found");
+  }
 });
 
 // Catch post logout and remove cookie for username
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id")
-  res.redirect("/urls"); //maybe use 'back' here eventually
+  res.redirect("/login");
 });
 
 //Catch post register and create user in DB var
