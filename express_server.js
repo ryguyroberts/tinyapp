@@ -70,6 +70,12 @@ app.post("/urls/:id", (req, res) => {
   }
 });
 
+// Catch post and set a cookie
+app.post("/login", (req, res) => {
+  res.cookie("username", req.body.username);
+  res.redirect("/urls"); //maybe use 'back' here
+
+});
 
 
 // Redirect if u/shorturl (Only things in "DB" of course)
