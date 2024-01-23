@@ -6,7 +6,7 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 
 // Variable Declartions (Instead of a database)
-const urlDatabase = {
+let urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
@@ -54,15 +54,23 @@ app.post("/urls/:id/delete", (req, res) => {
 
 
 app.post("/urls", (req, res) => {
+  console.log("got that post request!");
   let sixString = generateRandomString();
+  console.log(req.body.longURL);
   urlDatabase[sixString] = req.body.longURL;
+  console.log(urlDatabase);
   res.redirect(`/urls/${sixString}`);
 });
 
-//Catch post and udpate the requested URL long value
+//Catch post and update the requested URL long value
 app.post("/urls/:id", (req, res) => {
-  urlDatabase[req.params.id] = req.body.longURL;
-  res.redirect("/urls");
+  //Quick error check
+  if (urlDatabase[req.params.id]) {
+    urlDatabase[req.params.id] = req.body.longURL;
+    res.redirect("/urls");
+  } else {
+    res.status(404).send("Not Found: The specified redirect URL does not exist in the database.");
+  }
 });
 
 
