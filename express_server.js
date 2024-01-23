@@ -88,8 +88,7 @@ app.get("/urls/:id", (req, res) => {
 // Page for registration
 app.get("/register", (req, res) => {
   userName = req.cookies["user_id"];
-  const templateVars = { id: req.params.id,
-    longURL: urlDatabase[req.params.id],
+  const templateVars = {
     user: users[userName],
   };
   res.render("register", templateVars);
@@ -134,7 +133,7 @@ app.post("/logout", (req, res) => {
 //Catch post register and create user in DB var
 app.post("/register", (req, res) => {
   // If either email or pass empty error code.
-  if (req.body.email === "" || req.body.password === "") {
+  if (req.body.email.trim() === "" || req.body.password.trim() === "") {
     return res.status(400).send("Error: Cannot have empty email or password values");
   }
 
@@ -152,7 +151,6 @@ app.post("/register", (req, res) => {
   };
   res.cookie("user_id", id);
   res.redirect("/urls"); //maybe use 'back' here eventually
-
 });
 
 // Redirect if u/shorturl (Only things in "DB" of course)
