@@ -128,10 +128,10 @@ app.post("/urls/:id", (req, res) => {
 });
 
 // Catch post login and set a cookie // NOT UPDATED FOR LOGIN REFACTOR
-// app.post("/login", (req, res) => {
-//   res.cookie("username", req.body.username);
-//   res.redirect("/urls"); //maybe use 'back' here
-// });
+app.post("/login", (req, res) => {
+  res.cookie("username", req.body.username);
+  res.redirect("/urls"); //maybe use 'back' here
+});
 
 // Catch post logout and remove cookie for username
 app.post("/logout", (req, res) => {
