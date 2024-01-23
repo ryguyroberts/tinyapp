@@ -115,7 +115,7 @@ app.post("/urls/:id", (req, res) => {
     urlDatabase[req.params.id] = req.body.longURL;
     res.redirect("/urls");
   } else {
-    res.status(404).send("Not Found: The specified redirect URL does not exist in the database.");
+    res.status(400).send("Not Found: The specified redirect URL does not exist in the database.");
   }
 });
 
@@ -135,12 +135,12 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   // If either email or pass empty error code.
   if (req.body.email === "" || req.body.password === "") {
-    return res.status(404).send("Error: Cannot have empty email or password values");
+    return res.status(400).send("Error: Cannot have empty email or password values");
   }
 
   // If you register with an email that already exists
   if (findUser(req.body.email)) {
-    return res.status(404).send("Error: That email already exists as a user");
+    return res.status(400).send("Error: That email already exists as a user");
   }
 
   // If no errors gets here makes new user
