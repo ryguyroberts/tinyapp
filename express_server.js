@@ -54,11 +54,8 @@ app.post("/urls/:id/delete", (req, res) => {
 
 
 app.post("/urls", (req, res) => {
-  console.log("got that post request!");
   let sixString = generateRandomString();
-  console.log(req.body.longURL);
   urlDatabase[sixString] = req.body.longURL;
-  console.log(urlDatabase);
   res.redirect(`/urls/${sixString}`);
 });
 
