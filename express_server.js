@@ -47,33 +47,39 @@ app.get("/", (req, res) => {
 
 // Page of all URLS
 app.get("/urls", (req, res) => {
+  userName = req.cookies["user_id"]
   const templateVars = { urls: urlDatabase,
-    username: req.cookies["username"],
+    user: users[userName],
   };
   res.render("urls_index", templateVars);
 });
 
 // Page to make new URLS
 app.get("/urls/new", (req, res) => {
-  const templateVars = { username: req.cookies["username"] };
+  userName = req.cookies["user_id"];
+  const templateVars = {
+    user: users[userName]
+  };
   res.render("urls_new", templateVars);
 });
 
 
 // Page for unique shortened URLS
 app.get("/urls/:id", (req, res) => {
+  userName = req.cookies["user_id"];
   const templateVars = { id: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.cookies["username"],
+    user: users[userName],
   };
   res.render("urls_show", templateVars);
 });
 
 // Page for registration
 app.get("/register", (req, res) => {
+  userName = req.cookies["user_id"];
   const templateVars = { id: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.cookies["username"],
+    user: users[userName],
   };
   res.render("register", templateVars);
 });
@@ -102,7 +108,7 @@ app.post("/urls/:id", (req, res) => {
   }
 });
 
-// Catch post login and set a cookie
+// Catch post login and set a cookie // Not correct still referencing username // Need checks here for real login.
 app.post("/login", (req, res) => {
   res.cookie("username", req.body.username);
   res.redirect("/urls"); //maybe use 'back' here
@@ -110,7 +116,7 @@ app.post("/login", (req, res) => {
 
 // Catch post logout and remove cookie for username
 app.post("/logout", (req, res) => {
-  res.clearCookie("username")
+  res.clearCookie("user_id")
   res.redirect("/urls"); //maybe use 'back' here eventually
 });
 
@@ -122,8 +128,7 @@ app.post("/register", (req, res) => {
     email: req.body.email,
     password: req.body.password
   };
-  console.log(users);
-
+  res.cookie("user_id", id);
   res.redirect("/urls"); //maybe use 'back' here eventually
 });
 
