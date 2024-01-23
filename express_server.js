@@ -54,6 +54,15 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+// Page for registration
+app.get("/register", (req, res) => {
+  const templateVars = { id: req.params.id,
+    longURL: urlDatabase[req.params.id],
+    username: req.cookies["username"],
+  };
+  res.render("register", templateVars);
+});
+
 //Catch post and delete the requested URL ID
 app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id];
