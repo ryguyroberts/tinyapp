@@ -27,19 +27,11 @@
       </div>
     </form>
     <% } else { %> 
-    <!-- form that only displays when user cookie has no value-->
-      <form class="form-inline" action="/login" method="POST">
-        <div class="form-group mb-2 mx-auto">
-          <input
-            class="form-control"
-            type="text"
-            name="username"
-            placeholder="username"
-            style="width: 300px; margin: 1em"
-          />
-          <button type="submit" class="btn btn-primary" style="background-color: transparent; color: black; border-color: black; font-weight: bold;">Login</button>
+    <!-- button that only displays when user_id cookie has no value-->
+        <div class="m1-auto">
+          <a href="/login" class="btn btn-primary" style="text-decoration: none; color: black;">Login</a>
+          <a href="/register" class="btn btn-secondary" style="text-decoration: none; color: black;">Register</a>
         </div>
-      </form>
     <% } %>
   </nav>
 </header>

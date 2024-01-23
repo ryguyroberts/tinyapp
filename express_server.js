@@ -94,6 +94,15 @@ app.get("/register", (req, res) => {
   res.render("register", templateVars);
 });
 
+// Page for login
+app.get("/login", (req, res) => {
+  userName = req.cookies["user_id"];
+  const templateVars = {
+    user: users[userName],
+  };
+  res.render("login", templateVars);
+});
+
 //Catch post and delete the requested URL ID
 app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id];
@@ -118,11 +127,11 @@ app.post("/urls/:id", (req, res) => {
   }
 });
 
-// Catch post login and set a cookie // Not correct still referencing username // Need checks here for real login.
-app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username);
-  res.redirect("/urls"); //maybe use 'back' here
-});
+// Catch post login and set a cookie // NOT UPDATED FOR LOGIN REFACTOR
+// app.post("/login", (req, res) => {
+//   res.cookie("username", req.body.username);
+//   res.redirect("/urls"); //maybe use 'back' here
+// });
 
 // Catch post logout and remove cookie for username
 app.post("/logout", (req, res) => {
