@@ -40,6 +40,16 @@ const generateRandomString = () => {
   return randomString;
 };
 
+// find user in email object return null if no user or Obj if user.
+const findUser = (email) => {
+  const keyArr = Object.keys(users)
+  let foundUserID = keyArr.find(id => users[id].email === email );
+  if (foundUserID) {
+    return users[foundUserID];
+  }
+  return null;
+};
+
 // Not sure if I need this anymore. But its the default get for root /
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -122,6 +132,9 @@ app.post("/logout", (req, res) => {
 
 //Catch post register and create user in DB var
 app.post("/register", (req, res) => {
+  // If either email or pass empty 400 code.
+
+  // If you register
   let id = generateRandomString();
   users[id] = {
     id: id,
