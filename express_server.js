@@ -201,12 +201,11 @@ app.post("/register", (req, res) => {
 // Redirect if u/shorturl (Only things in "DB" of course)
 app.get("/u/:id", (req, res) => {
   const redirURL = urlDatabase[req.params.id];
-
   // Check first with our DB var if it exists.
   if (redirURL) {
     res.redirect(redirURL);
   } else {
-    res.status(404).send("Not Found: The specified redirect URL does not exist in the database.");
+    res.status(403).send("Not Found: The specified redirect URL does not exist in the database.");
   }
 });
 
