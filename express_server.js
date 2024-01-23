@@ -131,6 +131,9 @@ app.post("/urls/:id", (req, res) => {
 
 // Catch post login and set a cookie 
 app.post("/login", (req, res) => {
+  if (req.body.email.trim() === "" || req.body.password.trim() === "") {
+    return res.status(400).send("Error: Cannot have empty email or password values");
+  }
   //Lookup object in DB
   let user = findUser(req.body.email)
   if (user) {
