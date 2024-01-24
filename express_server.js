@@ -59,6 +59,21 @@ const findUserByEmail = (email) => {
   return null;
 };
 
+// Returns an Object of ONLY the urls belonging to specific user ID
+const urlsForUser = (ID) => {
+  keyArr = Object.keys(urlDatabase);
+  returnObj = {};
+  keyArr.forEach(key => {
+    if (urlDatabase[key].userID === ID) {
+      returnObj[key] = {
+        longURL: urlDatabase[key].longURL
+      }
+    }
+  });
+return returnObj;
+};
+
+
 // Check to see if user ID exists in USER DB.
 const userExists = (userId) => {
   const keyArr = Object.keys(users)
@@ -77,6 +92,7 @@ app.get("/", (req, res) => {
 // Page of all URLS
 app.get("/urls", (req, res) => {
   let userId = req.cookies["user_id"]
+  // Only display URLs of current user
   const templateVars = { urls: urlDatabase,
     user: users[userId],
     userReal: userExists(userId),
