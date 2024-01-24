@@ -73,9 +73,11 @@ app.get("/", (req, res) => {
 // Page of all URLS
 app.get("/urls", (req, res) => {
   let userName = req.cookies["user_id"]
+
   const templateVars = { urls: urlDatabase,
     user: users[userName],
   };
+  console.log(templateVars);
   res.render("urls_index", templateVars);
 });
 
@@ -108,7 +110,7 @@ app.get("/urls/:id", (req, res) => {
 app.get("/register", (req, res) => {
   let userName = req.cookies["user_id"];
   // redirect to URL if loggged in
-  if (userName) {
+  if (findUser(userName) !== null) {
     return res.redirect("/urls");
   }
   const templateVars = {
@@ -120,8 +122,8 @@ app.get("/register", (req, res) => {
 // Page for login
 app.get("/login", (req, res) => {
   userName = req.cookies["user_id"];
-  // redirect to URL if loggged in
-  if (userName) {
+  // redirect to URL if loggged in and user exists in DB
+  if (findUser(userName) !== null)  {
     return res.redirect("/urls");
   }
   const templateVars = {
