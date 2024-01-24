@@ -124,6 +124,12 @@ app.get("/urls/new", (req, res) => {
 // Page for unique shortened URLS
 app.get("/urls/:id", (req, res) => {
   let userID = req.cookies["user_id"];
+
+  // If url ID doesnt exists in DB
+  if (urlDatabase[req.params.id] === undefined) {
+    return res.status(400).send("That URL id does not exist");
+  }
+
   // If not logged in and not in our DB can't get here
   if (!userExists(userID)) {
     return res.status(401).send("Cannot access unique links unless signed in");
@@ -133,9 +139,9 @@ app.get("/urls/:id", (req, res) => {
     return res.status(401).send("Cannot access links that don't belong to you");
   }
 
-    const templateVars = { id: req.params.id,
-    longURL: urlDatabase[req.params.id].longURL,
-    user: users[userID],
+  const templateVars = { id: req.params.id,
+  longURL: urlDatabase[req.params.id].longURL,
+  user: users[userID],
   };
   return res.render("urls_show", templateVars);
 });
@@ -178,11 +184,6 @@ app.get("/u/:id", (req, res) => {
   }
 });
 
-//Catch post and delete the requested URL ID
-app.post("/urls/:id/delete", (req, res) => {
-  delete urlDatabase[req.params.id];
-  res.redirect("/urls");
-});
 
 //Catch new URLs being created generate random 6 digit for now
 app.post("/urls", (req, res) => {
@@ -201,13 +202,46 @@ app.post("/urls", (req, res) => {
 
 //Catch post and update the requested URL long value
 app.post("/urls/:id", (req, res) => {
-  //Quick error check
-  if (urlDatabase[req.params.id]) {
-    urlDatabase[req.params.id].longURL = req.body.longURL;
-    res.redirect("/urls");
-  } else {
-    res.status(400).send("Not Found: The specified redirect URL does not exist in the database.");
+  userID = req.cookies["user_id"];
+  if(urlDatabase[req.params.id] === undefined) {
+    res.status(400).send("Not Found: The specified URL does not exist in the database to update.");
   }
+  
+  // if not logged in no dice
+  if (!userExists(userID)) {
+    return res.status(401).send("Cannot update links unless signed in");
+  }
+
+  // If not your URL cannot update
+  if (urlDatabase[req.params.id].userID !== userID) {
+    return res.status(401).send("Cannot update links that don't belong to you");
+  }
+
+  urlDatabase[req.params.id].longURL = req.body.longURL;
+  res.redirect("/urls");
+
+});
+
+//Catch post and delete the requested URL ID
+app.post("/urls/:id/delete", (req, res) => {
+  let userID = req.cookies["user_id"];
+  // If Id doesn't exist can't delete
+  if (urlDatabase[req.params.id] === undefined) {
+    return res.status(400).send("That URL id does not exist");
+  }
+
+  // if not logged in no dice
+  if (!userExists(userID)) {
+    return res.status(401).send("Cannot access unique links unless signed in");
+  }
+
+  // if not your URL no delete
+  if (urlDatabase[req.params.id].userID !== userID) {
+      return res.status(401).send("Cannot delete links that don't belong to you");
+    }
+  
+  delete urlDatabase[req.params.id];
+  res.redirect("/urls");
 });
 
 // Catch post login and set a cookie 
