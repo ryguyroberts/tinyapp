@@ -78,19 +78,10 @@ const urlsForUser = (ID) => {
   return returnObj;
 };
 
-
-// Check to see if user ID exists in USER DB.
-const userExists = (userID) => {
-  if (users[userID]) {
-    return true;
-  }
-  return false;
-};
-
 // If on root/ Not logged in goes to login
 app.get("/", (req, res) => {
   let userID = req.cookies["user_id"];
-  if (userExists(userID)) {
+  if (users[userID]) {
     return res.redirect("/urls");
   }
   return res.redirect("/login");
@@ -101,13 +92,13 @@ app.get("/urls", (req, res) => {
   let userID = req.cookies["user_id"];
 
   // If not logged in redirect to login
-  if (!userExists(userID)) {
+  if (!users[userID]) {
     return res.redirect("/login");
   }
 
   let passDatabase = urlDatabase;
   // If user exists URLdb becomes URL object of only users
-  if (userExists(userID)) {
+  if (users[userID]) {
     passDatabase = urlsForUser(userID);
   }
 
@@ -121,7 +112,7 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   let userID = req.cookies["user_id"];
   //Not logged in get out!
-  if (!userExists(userID)) {
+  if (!users[userID]) {
     return res.redirect("/login");
   }
   const templateVars = {
@@ -141,7 +132,7 @@ app.get("/urls/:id", (req, res) => {
   }
 
   // If not logged in and not in our DB can't get here
-  if (!userExists(userID)) {
+  if (!users[userID]) {
     return res.redirect("/login");
   }
   // if link doesn't belong to use
@@ -161,7 +152,7 @@ app.get("/register", (req, res) => {
   let userID = req.cookies["user_id"];
 
   // redirect to URL if logged in And user exists in DB
-  if (userExists(userID)) {
+  if (users[userID]) {
     return res.redirect("/urls");
   }
   const templateVars = {
@@ -174,7 +165,7 @@ app.get("/register", (req, res) => {
 app.get("/login", (req, res) => {
   let userID = req.cookies["user_id"];
   // redirect to URL if logged in And user exists in DB
-  if (userExists(userID)) {
+  if (users[userID]) {
     return res.redirect("/urls");
   }
   const templateVars = {
@@ -198,7 +189,7 @@ app.get("/u/:id", (req, res) => {
 //Catch new URLs being created generate random 6 digit for now
 app.post("/urls", (req, res) => {
   let userID = req.cookies["user_id"];
-  if (userExists(userID)) {
+  if (users[userID]) {
     let sixString = generateRandomString();
     urlDatabase[sixString] = {
       longURL: req.body.longURL,
@@ -218,7 +209,7 @@ app.post("/urls/:id", (req, res) => {
   }
   
   // if not logged in no dice
-  if (!userExists(userID)) {
+  if (!users[userID]) {
     return res.status(401).send("Cannot update links unless signed in");
   }
 
@@ -241,7 +232,7 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 
   // if not logged in no dice
-  if (!userExists(userID)) {
+  if (!users[userID]) {
     return res.status(401).send("Cannot access unique links unless signed in");
   }
 
