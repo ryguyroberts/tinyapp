@@ -33,7 +33,7 @@
           <% for (let id in urls) { %>
             <tr>
               <td><a href="/urls/<%= id %>"><%= id %></a></td>
-              <td><%= urls[id] %></td>
+              <td><%= urls[id].longURL %></td>
               <!-- Button just hyperlinking to url show-->
               <td>
                 <a href="/urls/<%= id %>" class="btn btn-primary" style="background-color: white; color: blue; border-color: blue; font-weight: bold;">Edit</a>

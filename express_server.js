@@ -9,17 +9,29 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
 
 // Variable Declarations (Instead of a database)
-let urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
 
+// Old db Structure
+// let urlDatabase = {
+//   "b2xVn2": "http://www.lighthouselabs.ca",
+//   "9sm5xK": "http://www.google.com"
+// };
+
+const urlDatabase = {
+  b2xVn2: {
+    longURL: "http://www.lighthouselabs.ca",
+    userID: "123456"
+  },
+  i3BoGr: {
+    longURL: "http://www.google.com",
+    userID: "123456"
+  }
+}
 // Users with some pre-populated example
 const users = {
   userRandomID: {
-    id: "userRandomID",
+    id: "123456",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur",
+    password: "password",
   },
   user2RandomID: {
     id: "user2RandomID",
@@ -86,7 +98,7 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   let userName = req.cookies["user_id"];
   const templateVars = { id: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].longURL,
     user: users[userName],
   };
   res.render("urls_show", templateVars);
@@ -118,6 +130,17 @@ app.get("/login", (req, res) => {
   res.render("login", templateVars);
 });
 
+// Redirect if u/shorturl (Only things in "DB" of course)
+app.get("/u/:id", (req, res) => {
+  const redirURL = urlDatabase[req.params.id].longURL;
+  // Check first with our DB var if it exists.
+  if (redirURL) {
+    res.redirect(redirURL);
+  } else {
+    res.status(403).send("Not Found: The specified redirect URL does not exist in the database.");
+  }
+});
+
 //Catch post and delete the requested URL ID
 app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id];
@@ -129,7 +152,9 @@ app.post("/urls", (req, res) => {
   userName = req.cookies["user_id"];
   if (userName) {
     let sixString = generateRandomString();
-    urlDatabase[sixString] = req.body.longURL;
+    urlDatabase[sixString] = {
+      longURL: req.body.longURL,
+    }
     return res.redirect(`/urls/${sixString}`);
   } else {
     res.status(403).send("You cannot add a new URL unless you are logged in");
@@ -140,7 +165,7 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   //Quick error check
   if (urlDatabase[req.params.id]) {
-    urlDatabase[req.params.id] = req.body.longURL;
+    urlDatabase[req.params.id].longURL = req.body.longURL;
     res.redirect("/urls");
   } else {
     res.status(400).send("Not Found: The specified redirect URL does not exist in the database.");
@@ -198,16 +223,6 @@ app.post("/register", (req, res) => {
   res.redirect("/urls"); //maybe use 'back' here eventually
 });
 
-// Redirect if u/shorturl (Only things in "DB" of course)
-app.get("/u/:id", (req, res) => {
-  const redirURL = urlDatabase[req.params.id];
-  // Check first with our DB var if it exists.
-  if (redirURL) {
-    res.redirect(redirURL);
-  } else {
-    res.status(403).send("Not Found: The specified redirect URL does not exist in the database.");
-  }
-});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
