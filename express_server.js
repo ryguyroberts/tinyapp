@@ -1,12 +1,12 @@
 const express = require("express");
 const app = express();
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
 const PORT = 8080; // default port 8080
 
 // Config
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser())
+app.use(cookieParser());
 
 // Variable Declarations (Instead of a database)
 let urlDatabase = {
@@ -22,7 +22,7 @@ let urlDatabase = {
     longURL: "http://www.google.com",
     userID: "user2RandomID"
   },
-}
+};
 // Users with some pre-populated example
 let users = {
   // Test user 1 ez creds
@@ -55,8 +55,8 @@ const generateRandomString = () => {
 
 // find user in email object return null if no user or Obj if user.
 const findUserByEmail = (email) => {
-  const keyArr = Object.keys(users)
-  let foundUserID = keyArr.find(id => users[id].email === email );
+  const keyArr = Object.keys(users);
+  let foundUserID = keyArr.find(id => users[id].email === email);
   if (foundUserID) {
     return users[foundUserID];
   }
@@ -71,10 +71,10 @@ const urlsForUser = (ID) => {
     if (urlDatabase[key].userID === ID) {
       returnObj[key] = {
         longURL: urlDatabase[key].longURL
-      }
+      };
     }
   });
-return returnObj;
+  return returnObj;
 };
 
 
@@ -84,7 +84,7 @@ const userExists = (userID) => {
     return true;
   }
   return false;
-}
+};
 
 // If on root/ Not logged in goes to login
 app.get("/", (req, res) => {
@@ -97,7 +97,7 @@ app.get("/", (req, res) => {
 
 // Page of all URLS
 app.get("/urls", (req, res) => {
-  let userID = req.cookies["user_id"]
+  let userID = req.cookies["user_id"];
 
   let passDatabase = urlDatabase;
   // If user exists URLdb becomes URL object of only users
@@ -142,8 +142,8 @@ app.get("/urls/:id", (req, res) => {
   }
 
   const templateVars = { id: req.params.id,
-  longURL: urlDatabase[req.params.id].longURL,
-  user: users[userID],
+    longURL: urlDatabase[req.params.id].longURL,
+    user: users[userID],
   };
   return res.render("urls_show", templateVars);
 });
@@ -164,7 +164,7 @@ app.get("/register", (req, res) => {
 
 // Page for login
 app.get("/login", (req, res) => {
-  userID = req.cookies["user_id"];
+  let userID = req.cookies["user_id"];
   // redirect to URL if logged in And user exists in DB
   if (userExists(userID)) {
     return res.redirect("/urls");
@@ -189,7 +189,7 @@ app.get("/u/:id", (req, res) => {
 
 //Catch new URLs being created generate random 6 digit for now
 app.post("/urls", (req, res) => {
-  userID = req.cookies["user_id"];
+  let userID = req.cookies["user_id"];
   if (userExists(userID)) {
     let sixString = generateRandomString();
     urlDatabase[sixString] = {
@@ -204,8 +204,8 @@ app.post("/urls", (req, res) => {
 
 //Catch post and update the requested URL long value
 app.post("/urls/:id", (req, res) => {
-  userID = req.cookies["user_id"];
-  if(urlDatabase[req.params.id] === undefined) {
+  let userID = req.cookies["user_id"];
+  if (urlDatabase[req.params.id] === undefined) {
     res.status(400).send("Not Found: The specified URL does not exist in the database to update.");
   }
   
@@ -239,20 +239,20 @@ app.post("/urls/:id/delete", (req, res) => {
 
   // if not your URL no delete
   if (urlDatabase[req.params.id].userID !== userID) {
-      return res.status(401).send("Cannot delete links that don't belong to you");
-    }
+    return res.status(401).send("Cannot delete links that don't belong to you");
+  }
   
   delete urlDatabase[req.params.id];
   res.redirect("/urls");
 });
 
-// Catch post login and set a cookie 
+// Catch post login and set a cookie
 app.post("/login", (req, res) => {
   if (req.body.email.trim() === "" || req.body.password.trim() === "") {
     return res.status(400).send("Error: Cannot have empty email or password values");
   }
   //Lookup object in DB
-  let user = findUserByEmail(req.body.email)
+  let user = findUserByEmail(req.body.email);
   if (user) {
     // Found user check P/W
     if (user.password === req.body.password) {
@@ -270,7 +270,7 @@ app.post("/login", (req, res) => {
 
 // Catch post logout and remove cookie for username
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id")
+  res.clearCookie("user_id");
   res.redirect("/login");
 });
 
