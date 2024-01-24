@@ -9,14 +9,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
 
 // Variable Declarations (Instead of a database)
-
-// Old db Structure
-// let urlDatabase = {
-//   "b2xVn2": "http://www.lighthouselabs.ca",
-//   "9sm5xK": "http://www.google.com"
-// };
-
-const urlDatabase = {
+let urlDatabase = {
   b2xVn2: {
     longURL: "http://www.lighthouselabs.ca",
     userID: "123456"
@@ -27,8 +20,9 @@ const urlDatabase = {
   }
 }
 // Users with some pre-populated example
-const users = {
-  userRandomID: {
+let users = {
+  // Test user 1 ez creds
+  "123456": {
     id: "123456",
     email: "user@example.com",
     password: "password",
@@ -56,7 +50,7 @@ const generateRandomString = () => {
 };
 
 // find user in email object return null if no user or Obj if user.
-const findUser = (email) => {
+const findUserByEmail = (email) => {
   const keyArr = Object.keys(users)
   let foundUserID = keyArr.find(id => users[id].email === email );
   if (foundUserID) {
@@ -65,6 +59,16 @@ const findUser = (email) => {
   return null;
 };
 
+// Check to see if user ID exists in USER DB.
+const userExists = (userId) => {
+  const keyArr = Object.keys(users)
+  foundUser = keyArr.find(id => id === userId)
+  if (foundUser) {
+    return true;
+  }
+  return false;
+}
+
 // Not sure if I need this anymore. But its the default get for root /
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -72,21 +76,20 @@ app.get("/", (req, res) => {
 
 // Page of all URLS
 app.get("/urls", (req, res) => {
-  let userName = req.cookies["user_id"]
+  let userId = req.cookies["user_id"]
 
   const templateVars = { urls: urlDatabase,
-    user: users[userName],
+    user: users[userId],
   };
-  console.log(templateVars);
   res.render("urls_index", templateVars);
 });
 
 // Page to make new URLS
 app.get("/urls/new", (req, res) => {
-  let userName = req.cookies["user_id"];
-  if (userName) {
+  let userId = req.cookies["user_id"];
+  if (userExists(userId)) {
     const templateVars = {
-      user: users[userName]
+      user: users[userId]
     };
     return res.render("urls_new", templateVars);
   // If not logged can't get here. 
@@ -98,36 +101,37 @@ app.get("/urls/new", (req, res) => {
 
 // Page for unique shortened URLS
 app.get("/urls/:id", (req, res) => {
-  let userName = req.cookies["user_id"];
+  let userId = req.cookies["user_id"];
   const templateVars = { id: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
-    user: users[userName],
+    user: users[userId],
   };
   res.render("urls_show", templateVars);
 });
 
 // Page for registration
 app.get("/register", (req, res) => {
-  let userName = req.cookies["user_id"];
-  // redirect to URL if loggged in
-  if (findUser(userName) !== null) {
+  let userID = req.cookies["user_id"];
+
+  // redirect to URL if logged in And user exists in DB
+  if (userExists(userID)) {
     return res.redirect("/urls");
   }
   const templateVars = {
-    user: users[userName],
+    user: users[userID],
   };
   res.render("register", templateVars);
 });
 
 // Page for login
 app.get("/login", (req, res) => {
-  userName = req.cookies["user_id"];
-  // redirect to URL if loggged in and user exists in DB
-  if (findUser(userName) !== null)  {
+  userID = req.cookies["user_id"];
+  // redirect to URL if logged in And user exists in DB
+  if (userExists(userID)) {
     return res.redirect("/urls");
   }
   const templateVars = {
-    user: users[userName],
+    user: users[userID],
   };
   res.render("login", templateVars);
 });
@@ -151,8 +155,8 @@ app.post("/urls/:id/delete", (req, res) => {
 
 //Catch new URLs being created generate random 6 digit for now
 app.post("/urls", (req, res) => {
-  userName = req.cookies["user_id"];
-  if (userName) {
+  userID = req.cookies["user_id"];
+  if (userID) {
     let sixString = generateRandomString();
     urlDatabase[sixString] = {
       longURL: req.body.longURL,
@@ -180,7 +184,7 @@ app.post("/login", (req, res) => {
     return res.status(400).send("Error: Cannot have empty email or password values");
   }
   //Lookup object in DB
-  let user = findUser(req.body.email)
+  let user = findUserByEmail(req.body.email)
   if (user) {
     // Found user check P/W
     if (user.password === req.body.password) {
@@ -210,7 +214,7 @@ app.post("/register", (req, res) => {
   }
 
   // If you register with an email that already exists
-  if (findUser(req.body.email)) {
+  if (findUserByEmail(req.body.email)) {
     return res.status(400).send("Error: That email already exists as a user");
   }
 
