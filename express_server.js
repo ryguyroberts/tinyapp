@@ -65,8 +65,8 @@ const findUserByEmail = (email) => {
 
 // Returns an Object of ONLY the urls belonging to specific user ID
 const urlsForUser = (ID) => {
-  keyArr = Object.keys(urlDatabase);
-  returnObj = {};
+  let keyArr = Object.keys(urlDatabase);
+  let returnObj = {};
   keyArr.forEach(key => {
     if (urlDatabase[key].userID === ID) {
       returnObj[key] = {
@@ -80,17 +80,19 @@ return returnObj;
 
 // Check to see if user ID exists in USER DB.
 const userExists = (userID) => {
-  const keyArr = Object.keys(users)
-  foundUser = keyArr.find(id => id === userID)
-  if (foundUser) {
+  if (users[userID]) {
     return true;
   }
   return false;
 }
 
-// Not sure if I need this anymore. But its the default get for root /
+// If on root/ Not logged in goes to login
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  let userID = req.cookies["user_id"];
+  if (userExists(userID)) {
+    return res.redirect("/urls");
+  }
+  return res.redirect("/login");
 });
 
 // Page of all URLS
@@ -188,7 +190,7 @@ app.get("/u/:id", (req, res) => {
 //Catch new URLs being created generate random 6 digit for now
 app.post("/urls", (req, res) => {
   userID = req.cookies["user_id"];
-  if (userID) {
+  if (userExists(userID)) {
     let sixString = generateRandomString();
     urlDatabase[sixString] = {
       longURL: req.body.longURL,
