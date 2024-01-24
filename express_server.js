@@ -77,9 +77,9 @@ app.get("/", (req, res) => {
 // Page of all URLS
 app.get("/urls", (req, res) => {
   let userId = req.cookies["user_id"]
-
   const templateVars = { urls: urlDatabase,
     user: users[userId],
+    userReal: userExists(userId),
   };
   res.render("urls_index", templateVars);
 });
@@ -87,15 +87,11 @@ app.get("/urls", (req, res) => {
 // Page to make new URLS
 app.get("/urls/new", (req, res) => {
   let userId = req.cookies["user_id"];
-  if (userExists(userId)) {
-    const templateVars = {
-      user: users[userId]
-    };
-    return res.render("urls_new", templateVars);
-  // If not logged can't get here. 
-  } else {
-    return res.redirect("/login");
-  }
+  const templateVars = {
+    user: users[userId],
+    userReal: userExists(userId),
+  };
+  return res.render("urls_new", templateVars);
 });
 
 

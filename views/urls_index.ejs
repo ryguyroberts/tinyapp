@@ -18,7 +18,7 @@
   </head>
   <body>
     <%- include('partials/_header') %>
-    <% if(user !== undefined){ %>
+    <% if(userReal === true){ %>
     <main style="margin: 1em;">
       <h3>My URLs</h3>
       <table class="table">
@@ -50,9 +50,9 @@
       </table>
     </main>
     <% } else { %>
-      <div>
+      <body>
         Must be logged in to see URLs
-      </div>
+      </body>
     <% } %>
     <!-- Bootstrap JS -->
     <script

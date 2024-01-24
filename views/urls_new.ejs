@@ -17,10 +17,9 @@
 
     <title>New URL - TinyApp Example</title>
   </head>
-
   <body>
     <%- include('partials/_header') %>
-
+    <% if(userReal === true){ %>
     <main style="margin: 1em;">
       <h3>Create TinyURL</h3>
       <form class="form-inline" action="/urls" method="POST">
@@ -54,4 +53,9 @@
       crossorigin="anonymous"
     ></script>
   </body>
+  <% } else { %>
+    <body>
+      Must be logged in to see URLs
+    </body>
+  <% } %>
 </html>
