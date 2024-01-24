@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const cookieParser = require('cookie-parser');
 const PORT = 8080; // default port 8080
+const bcrypt = require("bcryptjs");
 
 // Config
 app.set("view engine", "ejs");
@@ -30,7 +31,7 @@ let users = {
   "123456": {
     id: "123456",
     email: "user@example.com",
-    password: "password",
+    password: bcrypt.hashSync("password", 10)
   },
   user2RandomID: {
     id: "user2RandomID",
@@ -247,7 +248,6 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // Catch post login and set a cookie
 app.post("/login", (req, res) => {
-  console.log(req.body.email);
   if (req.body.email.trim() === "" || req.body.password.trim() === "") {
     return res.status(400).send("Error: Cannot have empty email or password values");
   }
@@ -255,7 +255,8 @@ app.post("/login", (req, res) => {
   let user = findUserByEmail(req.body.email);
   if (user) {
     // Found user check P/W
-    if (user.password === req.body.password) {
+    // bcrypt.compareSync(req.body.password, user.password)
+    if (bcrypt.compareSync(req.body.password, user.password)) {
       res.cookie("user_id", user.id);
       res.redirect("/urls"); //maybe use 'back' here
     // Pw don't match
@@ -291,7 +292,7 @@ app.post("/register", (req, res) => {
   users[id] = {
     id: id,
     email: req.body.email,
-    password: req.body.password
+    password: bcrypt.hashSync(req.body.password, 10)
   };
   res.cookie("user_id", id);
   res.redirect("/urls"); //maybe use 'back' here eventually
