@@ -17,7 +17,11 @@ let urlDatabase = {
   i3BoGr: {
     longURL: "http://www.google.com",
     userID: "123456"
-  }
+  },
+  i3Bodd: {
+    longURL: "http://www.google.com",
+    userID: "user2RandomID"
+  },
 }
 // Users with some pre-populated example
 let users = {
@@ -75,9 +79,9 @@ return returnObj;
 
 
 // Check to see if user ID exists in USER DB.
-const userExists = (userId) => {
+const userExists = (userID) => {
   const keyArr = Object.keys(users)
-  foundUser = keyArr.find(id => id === userId)
+  foundUser = keyArr.find(id => id === userID)
   if (foundUser) {
     return true;
   }
@@ -91,21 +95,27 @@ app.get("/", (req, res) => {
 
 // Page of all URLS
 app.get("/urls", (req, res) => {
-  let userId = req.cookies["user_id"]
-  // Only display URLs of current user
-  const templateVars = { urls: urlDatabase,
-    user: users[userId],
-    userReal: userExists(userId),
+  let userID = req.cookies["user_id"]
+
+  let passDatabase = urlDatabase;
+  // If user exists URLdb becomes URL object of only users
+  if (userExists(userID)) {
+    passDatabase = urlsForUser(userID);
+  }
+
+  const templateVars = { urls: passDatabase,
+    user: users[userID],
+    userReal: userExists(userID),
   };
   res.render("urls_index", templateVars);
 });
 
 // Page to make new URLS
 app.get("/urls/new", (req, res) => {
-  let userId = req.cookies["user_id"];
+  let userID = req.cookies["user_id"];
   const templateVars = {
-    user: users[userId],
-    userReal: userExists(userId),
+    user: users[userID],
+    userReal: userExists(userID),
   };
   return res.render("urls_new", templateVars);
 });
@@ -113,10 +123,10 @@ app.get("/urls/new", (req, res) => {
 
 // Page for unique shortened URLS
 app.get("/urls/:id", (req, res) => {
-  let userId = req.cookies["user_id"];
+  let userID = req.cookies["user_id"];
   const templateVars = { id: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
-    user: users[userId],
+    user: users[userID],
   };
   res.render("urls_show", templateVars);
 });
@@ -172,6 +182,7 @@ app.post("/urls", (req, res) => {
     let sixString = generateRandomString();
     urlDatabase[sixString] = {
       longURL: req.body.longURL,
+      userID: userID
     }
     return res.redirect(`/urls/${sixString}`);
   } else {
