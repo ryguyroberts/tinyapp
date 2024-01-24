@@ -100,6 +100,11 @@ app.get("/", (req, res) => {
 app.get("/urls", (req, res) => {
   let userID = req.cookies["user_id"];
 
+  // If not logged in redirect to login
+  if (!userExists(userID)) {
+    return res.redirect("/login");
+  }
+
   let passDatabase = urlDatabase;
   // If user exists URLdb becomes URL object of only users
   if (userExists(userID)) {
@@ -107,8 +112,7 @@ app.get("/urls", (req, res) => {
   }
 
   const templateVars = { urls: passDatabase,
-    user: users[userID],
-    userReal: userExists(userID),
+    user: users[userID]
   };
   res.render("urls_index", templateVars);
 });
@@ -122,7 +126,6 @@ app.get("/urls/new", (req, res) => {
   }
   const templateVars = {
     user: users[userID],
-    userReal: userExists(userID),
   };
   return res.render("urls_new", templateVars);
 });
