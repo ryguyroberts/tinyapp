@@ -6,6 +6,7 @@ const PORT = 8080; // default port 8080
 // Config
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(cookieParser());
 
 // Variable Declarations (Instead of a database)
@@ -115,6 +116,10 @@ app.get("/urls", (req, res) => {
 // Page to make new URLS
 app.get("/urls/new", (req, res) => {
   let userID = req.cookies["user_id"];
+  //Not logged in get out!
+  if (!userExists(userID)) {
+    return res.redirect("/login");
+  }
   const templateVars = {
     user: users[userID],
     userReal: userExists(userID),
@@ -134,11 +139,11 @@ app.get("/urls/:id", (req, res) => {
 
   // If not logged in and not in our DB can't get here
   if (!userExists(userID)) {
-    return res.status(401).send("Cannot access unique links unless signed in");
+    return res.redirect("/login");
   }
   // if link doesn't belong to use
   if (urlDatabase[req.params.id].userID !== userID) {
-    return res.status(401).send("Cannot access links that don't belong to you");
+    return res.status(403).send("Cannot access links that don't belong to you");
   }
 
   const templateVars = { id: req.params.id,
@@ -216,7 +221,7 @@ app.post("/urls/:id", (req, res) => {
 
   // If not your URL cannot update
   if (urlDatabase[req.params.id].userID !== userID) {
-    return res.status(401).send("Cannot update links that don't belong to you");
+    return res.status(403).send("Cannot update links that don't belong to you");
   }
 
   urlDatabase[req.params.id].longURL = req.body.longURL;
@@ -248,6 +253,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // Catch post login and set a cookie
 app.post("/login", (req, res) => {
+  console.log(req.body.email);
   if (req.body.email.trim() === "" || req.body.password.trim() === "") {
     return res.status(400).send("Error: Cannot have empty email or password values");
   }
