@@ -124,11 +124,20 @@ app.get("/urls/new", (req, res) => {
 // Page for unique shortened URLS
 app.get("/urls/:id", (req, res) => {
   let userID = req.cookies["user_id"];
-  const templateVars = { id: req.params.id,
+  // If not logged in and not in our DB can't get here
+  if (!userExists(userID)) {
+    return res.status(401).send("Cannot access unique links unless signed in");
+  }
+  // if link doesn't belong to use
+  if (urlDatabase[req.params.id].userID !== userID) {
+    return res.status(401).send("Cannot access links that don't belong to you");
+  }
+
+    const templateVars = { id: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
     user: users[userID],
   };
-  res.render("urls_show", templateVars);
+  return res.render("urls_show", templateVars);
 });
 
 // Page for registration
@@ -183,7 +192,7 @@ app.post("/urls", (req, res) => {
     urlDatabase[sixString] = {
       longURL: req.body.longURL,
       userID: userID
-    }
+    };
     return res.redirect(`/urls/${sixString}`);
   } else {
     res.status(403).send("You cannot add a new URL unless you are logged in");
