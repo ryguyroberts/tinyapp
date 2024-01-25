@@ -15,7 +15,7 @@ app.use(cookieParser({
   keys: ["12345679"],
   maxAge: 24 * 60 * 60 * 1000, // 24 hours
   secure: false,
-  httpOnly: true,
+  httpOnly: true, 
   sameSite: 'strict',
 }));
 
@@ -40,7 +40,7 @@ let users = {
   "123456": {
     id: "123456",
     email: "user@example.com",
-    password: bcrypt.hashSync("password", 10)
+    password: bcrypt.hashSync("pass", 10)
   },
   user2RandomID: {
     id: "user2RandomID",
@@ -173,18 +173,17 @@ app.get("/login", (req, res) => {
   const templateVars = {
     user: users[userID],
   };
-  res.render("login", templateVars);
+  return res.render("login", templateVars);
 });
 
 // Redirect if u/shorturl (Only things in "DB" of course)
+// Doing this weird?
 app.get("/u/:id", (req, res) => {
-  const redirURL = urlDatabase[req.params.id].longURL;
-  // Check first with our DB var if it exists.
-  if (redirURL) {
-    res.redirect(redirURL);
-  } else {
-    res.status(403).send("Not Found: The specified redirect URL does not exist in the database.");
+  // Check first if ID exists in urlDB if it exists.
+  if (!urlDatabase[req.params.id]) {
+    return res.status(403).send("Not Found: The specified redirect URL does not exist in the database.");
   }
+  res.redirect(urlDatabase[req.params.id].longURL);
 });
 
 
@@ -257,7 +256,7 @@ app.post("/login", (req, res) => {
   if (user) {
     // Found user check P/W
     if (bcrypt.compareSync(req.body.password, user.password)) {
-      req.session.user_id = user.id
+      req.session.user_id = user.id;
       res.redirect("/urls"); //maybe use 'back' here
     // Pw don't match
     } else {
