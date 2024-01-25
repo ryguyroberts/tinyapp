@@ -3,6 +3,8 @@ const app = express();
 const cookieParser = require('cookie-session');
 const PORT = 8080; // default port 8080
 const bcrypt = require("bcryptjs");
+const { findUserByEmail } = require("./helpers");
+
 
 // Config
 app.set("view engine", "ejs");
@@ -60,16 +62,6 @@ const generateRandomString = () => {
     randomString += char;
   }
   return randomString;
-};
-
-// find user in email object return null if no user or Obj if user.
-const findUserByEmail = (email , database) => {
-  const keyArr = Object.keys(users);
-  let foundUserID = keyArr.find(id => database[id].email === email);
-  if (foundUserID) {
-    return users[foundUserID];
-  }
-  return null;
 };
 
 // Returns an Object of ONLY the urls belonging to specific user ID
