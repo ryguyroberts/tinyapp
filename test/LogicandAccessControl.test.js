@@ -60,7 +60,7 @@ describe("Login and Access Control Test", () => {
     // Step 1: Login with valid credentials
     return agent
       .post("/login")
-      .send({ email: "user@example.com", password: "password" })
+      .send({ email: "user@example.com", password: "pass" })
       .then((loginRes) => {
         // Step 2: Make a GET request to a protected resource
         return agent.get("/urls/i3Bodd").then((accessRes) => {
