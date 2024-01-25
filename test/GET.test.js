@@ -32,9 +32,6 @@ describe("Get / route tests", () => {
   });
 });
 
-
-
-
 describe("Get /urls route tests", () => {
   it('if logged in get request to valid urls/:id is success', () => {
     const agent = chai.request.agent("http://localhost:8080");
