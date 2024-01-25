@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-session');
 const PORT = 8080; // default port 8080
 const bcrypt = require("bcryptjs");
 
@@ -8,7 +8,14 @@ const bcrypt = require("bcryptjs");
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cookieParser());
+app.use(cookieParser({
+  name: 'session',
+  keys: ["12345679"],
+  maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  secure: false,
+  httpOnly: true,
+  sameSite: 'strict',
+}));
 
 // Variable Declarations (Instead of a database)
 let urlDatabase = {
@@ -81,7 +88,7 @@ const urlsForUser = (ID) => {
 
 // If on root/ Not logged in goes to login
 app.get("/", (req, res) => {
-  let userID = req.cookies["user_id"];
+  let userID = req.session.user_id;
   if (users[userID]) {
     return res.redirect("/urls");
   }
@@ -90,7 +97,7 @@ app.get("/", (req, res) => {
 
 // Page of all URLS
 app.get("/urls", (req, res) => {
-  let userID = req.cookies["user_id"];
+  let userID = req.session.user_id;
 
   // If not logged in redirect to login
   if (!users[userID]) {
@@ -111,7 +118,7 @@ app.get("/urls", (req, res) => {
 
 // Page to make new URLS
 app.get("/urls/new", (req, res) => {
-  let userID = req.cookies["user_id"];
+  let userID = req.session.user_id;
   //Not logged in get out!
   if (!users[userID]) {
     return res.redirect("/login");
@@ -125,7 +132,7 @@ app.get("/urls/new", (req, res) => {
 
 // Page for unique shortened URLS
 app.get("/urls/:id", (req, res) => {
-  let userID = req.cookies["user_id"];
+  let userID = req.session.user_id;
 
   // If url ID doesnt exists in DB
   if (urlDatabase[req.params.id] === undefined) {
@@ -150,7 +157,7 @@ app.get("/urls/:id", (req, res) => {
 
 // Page for registration
 app.get("/register", (req, res) => {
-  let userID = req.cookies["user_id"];
+  let userID = req.session.user_id;
 
   // redirect to URL if logged in And user exists in DB
   if (users[userID]) {
@@ -164,7 +171,7 @@ app.get("/register", (req, res) => {
 
 // Page for login
 app.get("/login", (req, res) => {
-  let userID = req.cookies["user_id"];
+  let userID = req.session.user_id;
   // redirect to URL if logged in And user exists in DB
   if (users[userID]) {
     return res.redirect("/urls");
@@ -189,7 +196,7 @@ app.get("/u/:id", (req, res) => {
 
 //Catch new URLs being created generate random 6 digit for now
 app.post("/urls", (req, res) => {
-  let userID = req.cookies["user_id"];
+  let userID = req.session.user_id;
   if (users[userID]) {
     let sixString = generateRandomString();
     urlDatabase[sixString] = {
@@ -204,7 +211,7 @@ app.post("/urls", (req, res) => {
 
 //Catch post and update the requested URL long value
 app.post("/urls/:id", (req, res) => {
-  let userID = req.cookies["user_id"];
+  let userID = req.session.user_id;
   if (urlDatabase[req.params.id] === undefined) {
     res.status(400).send("Not Found: The specified URL does not exist in the database to update.");
   }
@@ -226,7 +233,7 @@ app.post("/urls/:id", (req, res) => {
 
 //Catch post and delete the requested URL ID
 app.post("/urls/:id/delete", (req, res) => {
-  let userID = req.cookies["user_id"];
+  let userID = req.session.user_id;
   // If Id doesn't exist can't delete
   if (urlDatabase[req.params.id] === undefined) {
     return res.status(400).send("That URL id does not exist");
@@ -255,9 +262,8 @@ app.post("/login", (req, res) => {
   let user = findUserByEmail(req.body.email);
   if (user) {
     // Found user check P/W
-    // bcrypt.compareSync(req.body.password, user.password)
     if (bcrypt.compareSync(req.body.password, user.password)) {
-      res.cookie("user_id", user.id);
+      req.session.user_id = user.id
       res.redirect("/urls"); //maybe use 'back' here
     // Pw don't match
     } else {
@@ -271,7 +277,7 @@ app.post("/login", (req, res) => {
 
 // Catch post logout and remove cookie for username
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  req.session = null;
   res.redirect("/login");
 });
 
@@ -294,7 +300,7 @@ app.post("/register", (req, res) => {
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, 10)
   };
-  res.cookie("user_id", id);
+  req.session.user_id = id;
   res.redirect("/urls"); //maybe use 'back' here eventually
 });
 
