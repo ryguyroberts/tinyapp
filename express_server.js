@@ -153,7 +153,7 @@ app.get("/login", (req, res) => {
 app.get("/u/:id", (req, res) => {
   // Check first if ID exists in urlDB if it exists.
   if (!urlDatabase[req.params.id]) {
-    return res.status(403).send("Not Found: The specified redirect URL does not exist in the database.");
+    return res.status(400).send("Not Found: The specified redirect URL does not exist in the database.");
   }
   res.redirect(urlDatabase[req.params.id].longURL);
 });
