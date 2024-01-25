@@ -3,7 +3,7 @@ const app = express();
 const cookieParser = require('cookie-session');
 const PORT = 8080; // default port 8080
 const bcrypt = require("bcryptjs");
-const { findUserByEmail } = require("./helpers");
+const { findUserByEmail, generateRandomString, urlsForUser } = require("./helpers");
 
 
 // Config
@@ -49,36 +49,7 @@ let users = {
   },
 };
 
-
-// Some functions that will exist here for now
-
-// Generate 6digit id
-// Move to own file soon.
-const generateRandomString = () => {
-  // Might be a better way but this works.
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let randomString = "";
-  for (let i = 0; i < 6; i++) {
-    let char = characters.charAt(Math.floor(Math.random() * characters.length));
-    randomString += char;
-  }
-  return randomString;
-};
-
-// Returns an Object of ONLY the urls belonging to specific user ID
-// Move to own file soon
-const urlsForUser = (ID) => {
-  let keyArr = Object.keys(urlDatabase);
-  let returnObj = {};
-  keyArr.forEach(key => {
-    if (urlDatabase[key].userID === ID) {
-      returnObj[key] = {
-        longURL: urlDatabase[key].longURL
-      };
-    }
-  });
-  return returnObj;
-};
+// GET routes
 
 // If on root/ Not logged in goes to login
 app.get("/", (req, res) => {
@@ -101,7 +72,7 @@ app.get("/urls", (req, res) => {
   let passDatabase = urlDatabase;
   // If user exists URLdb becomes URL object of only users
   if (users[userID]) {
-    passDatabase = urlsForUser(userID);
+    passDatabase = urlsForUser(userID, urlDatabase);
   }
 
   const templateVars = { urls: passDatabase,
@@ -127,17 +98,17 @@ app.get("/urls/new", (req, res) => {
 // Page for unique shortened URLS
 app.get("/urls/:id", (req, res) => {
   let userID = req.session.user_id;
-
-  // If url ID doesnt exists in DB
-  if (urlDatabase[req.params.id] === undefined) {
-    return res.status(400).send("That URL id does not exist");
-  }
-
-  // If not logged in and not in our DB can't get here
+  // If not logged in redirect
   if (!users[userID]) {
     return res.redirect("/login");
   }
-  // if link doesn't belong to use
+
+  // if that URL doesn't exists in DB.
+  if (!urlDatabase[req.params.id]) {
+    return res.status(400).send("That URL doesn't exist in DB");
+  }
+
+  // if link doesn't belong to user
   if (urlDatabase[req.params.id].userID !== userID) {
     return res.status(403).send("Cannot access links that don't belong to you");
   }
@@ -186,6 +157,7 @@ app.get("/u/:id", (req, res) => {
   res.redirect(urlDatabase[req.params.id].longURL);
 });
 
+// POST Routes
 
 //Catch new URLs being created generate random 6 digit for now
 app.post("/urls", (req, res) => {
