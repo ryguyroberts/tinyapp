@@ -45,7 +45,7 @@ describe("Login and Access Control Test", () => {
     const agent = chai.request.agent("http://localhost:8080");
     return agent
       .post("/login")
-      .send({ email: "user@example.com", password: "password" })
+      .send({ email: "user@example.com", password: "pass" })
       .then((loginRes) => {
         return agent.get("/urls/madeup").then((accessRes) => {
           expect(accessRes).to.have.status(400);
@@ -76,11 +76,11 @@ describe("Login and Access Control Test", () => {
     // Step 1: Login with valid credentials
     return agent
       .post("/login")
-      .send({ email: "user@example.com", password: "password" })
+      .send({ email: "user@example.com", password: "pass" })
       .then((loginRes) => {
         // Step 2: Make a GET request to a protected resource
         return agent.get("/urls/i3BoGr").then((accessRes) => {
-          // Step 3: Expect the status code to be 200
+          // Step 3: Expect the status code to be 403
           expect(accessRes).to.have.status(200);
         });
       });
