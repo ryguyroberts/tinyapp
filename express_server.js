@@ -63,9 +63,9 @@ const generateRandomString = () => {
 };
 
 // find user in email object return null if no user or Obj if user.
-const findUserByEmail = (email) => {
+const findUserByEmail = (email , database) => {
   const keyArr = Object.keys(users);
-  let foundUserID = keyArr.find(id => users[id].email === email);
+  let foundUserID = keyArr.find(id => database[id].email === email);
   if (foundUserID) {
     return users[foundUserID];
   }
@@ -259,7 +259,7 @@ app.post("/login", (req, res) => {
     return res.status(400).send("Error: Cannot have empty email or password values");
   }
   //Lookup object in DB
-  let user = findUserByEmail(req.body.email);
+  let user = findUserByEmail(req.body.email, users);
   if (user) {
     // Found user check P/W
     if (bcrypt.compareSync(req.body.password, user.password)) {
@@ -289,7 +289,7 @@ app.post("/register", (req, res) => {
   }
 
   // If you register with an email that already exists
-  if (findUserByEmail(req.body.email)) {
+  if (findUserByEmail(req.body.email, users)) {
     return res.status(400).send("Error: That email already exists as a user");
   }
 
