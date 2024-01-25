@@ -1,4 +1,5 @@
 const express = require("express");
+const methodOverride = require('method-override')
 const app = express();
 const cookieParser = require('cookie-session');
 const PORT = 8080; // default port 8080
@@ -15,6 +16,7 @@ app.use(cookieParser({
   keys: ["12345679"], // Should be secret in a real app
   maxAge: 24 * 60 * 60 * 1000, // 24 hours
 }));
+app.use(methodOverride('_method'))
 
 // Variable Declarations (Instead of a database)
 let urlDatabase = {
@@ -172,7 +174,7 @@ app.post("/urls", (req, res) => {
 });
 
 //Catch post and update the requested URL long value
-app.post("/urls/:id", (req, res) => {
+app.put("/urls/:id", (req, res) => {
   let userID = req.session.user_id;
   
   // if not logged in no dice
@@ -197,7 +199,7 @@ app.post("/urls/:id", (req, res) => {
 });
 
 //Catch post and delete the requested URL ID
-app.post("/urls/:id/delete", (req, res) => {
+app.delete("/urls/:id/delete", (req, res) => {
   let userID = req.session.user_id;
 
   // if not logged in no dice
@@ -242,7 +244,7 @@ app.post("/login", (req, res) => {
 });
 
 // Catch post logout and remove cookie for username
-app.post("/logout", (req, res) => {
+app.delete("/logout", (req, res) => {
   req.session = null;
   res.redirect("/login");
 });

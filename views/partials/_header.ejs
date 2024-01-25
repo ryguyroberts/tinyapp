@@ -20,7 +20,7 @@
     </div>
     <!-- form that only displays when user cookie has valuelogged in-->
     <% if(user){ %>
-    <form class="form-inline" action="/logout" method="POST">
+    <form class="form-inline" action="/logout?_method=DELETE" method="POST">
       <label style="font-weight: bold; margin-right: 10px;" for="username">Logged in as: <%= user.email %></label>
       <div class="form-group mb-2 mx-auto">
         <button type="submit" class="btn btn-primary" style="background-color: black; color: white; border-color: black; font-weight: bold;">Logout</button>

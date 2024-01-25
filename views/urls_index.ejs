@@ -39,7 +39,7 @@
                 <a href="/urls/<%= id %>" class="btn btn-primary" style="background-color: white; color: blue; border-color: blue; font-weight: bold;">Edit</a>
               </td>
               <td>
-                <form class="form-inline" method="POST" action="/urls/<%= id %>/delete">
+                <form class="form-inline" method="POST" action="/urls/<%= id %>/delete?_method=DELETE">
                   <button type="submit" class="btn btn-primary" style="background-color: white; color: red; border-color: red; font-weight: bold;">Delete</button>
                 </form>
               </td>

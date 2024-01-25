@@ -30,7 +30,7 @@
         <h3 style="color: gray;" class="text-center">Edit</h3>
 
         <!-- might need to change the ID to dynamic maybenot coded? -->
-        <form class="form-inline" action="/urls/<%= id %>" method="POST">
+        <form class="form-inline" action="/urls/<%= id %>?_method=PUT" method="POST">
           <div class="form-group mb-2 mx-auto">
             <label style="color: gray; font-weight: bold;"longURL">New URL:</label>
             <input
