@@ -160,19 +160,19 @@ app.get("/u/:id", (req, res) => {
 
 // POST Routes
 
-//Catch new URLs being created generate random 6 digit for now
+//Catch new URLs being created generate random 6 digit for ID
 app.post("/urls", (req, res) => {
   let userID = req.session.user_id;
-  if (users[userID]) {
-    let sixString = generateRandomString();
-    urlDatabase[sixString] = {
-      longURL: req.body.longURL,
-      userID: userID
-    };
-    return res.redirect(`/urls/${sixString}`);
-  } else {
-    res.status(403).send("You cannot add a new URL unless you are logged in");
+  // If not logged in can't make new URLS!
+  if (!users[userID]) {
+    return res.status(401).send("You cannot add a new URL unless you are logged in");
   }
+  let sixString = generateRandomString();
+  urlDatabase[sixString] = {
+    longURL: req.body.longURL,
+    userID: userID
+  };
+  return res.redirect(`/urls/${sixString}`);
 });
 
 //Catch post and update the requested URL long value
@@ -275,3 +275,6 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
+module.exports = {
+  urlDatabase,
+};
