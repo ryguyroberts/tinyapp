@@ -39,10 +39,10 @@ let users = {
     email: "user@example.com",
     password: bcrypt.hashSync("pass", 10)
   },
-  user2RandomID: {
+  "654321": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk",
+    password: bcrypt.hashSync("pass", 10),
   },
 };
 
@@ -98,7 +98,7 @@ app.get("/urls/:id", (req, res) => {
 
   // If not logged in foribidden access error
   if (!users[userID]) {
-    return res.status(403).send("Must be logged in to access unique Urls");
+    return res.status(401).send("Must be logged in to access unique Urls");
   }
 
   // if that URL doesn't exists in DB.
@@ -175,13 +175,15 @@ app.post("/urls", (req, res) => {
 //Catch post and update the requested URL long value
 app.post("/urls/:id", (req, res) => {
   let userID = req.session.user_id;
-  if (urlDatabase[req.params.id] === undefined) {
-    res.status(400).send("Not Found: The specified URL does not exist in the database to update.");
-  }
   
   // if not logged in no dice
   if (!users[userID]) {
     return res.status(401).send("Cannot update links unless signed in");
+  }
+
+  // It it doesn't exist can't update
+  if (urlDatabase[req.params.id] === undefined) {
+    res.status(400).send("Not Found: The specified URL does not exist in the database to update.");
   }
 
   // If not your URL cannot update
@@ -189,6 +191,7 @@ app.post("/urls/:id", (req, res) => {
     return res.status(403).send("Cannot update links that don't belong to you");
   }
 
+  //Makes it hear updae the URL
   urlDatabase[req.params.id].longURL = req.body.longURL;
   res.redirect("/urls");
 
@@ -197,14 +200,15 @@ app.post("/urls/:id", (req, res) => {
 //Catch post and delete the requested URL ID
 app.post("/urls/:id/delete", (req, res) => {
   let userID = req.session.user_id;
-  // If Id doesn't exist can't delete
-  if (urlDatabase[req.params.id] === undefined) {
-    return res.status(400).send("That URL id does not exist");
-  }
 
   // if not logged in no dice
   if (!users[userID]) {
     return res.status(401).send("Cannot access unique links unless signed in");
+  }
+
+  // If Id doesn't exist can't delete
+  if (!urlDatabase[req.params.id]) {
+    return res.status(400).send("That URL id does not exist");
   }
 
   // if not your URL no delete
@@ -227,7 +231,7 @@ app.post("/login", (req, res) => {
     // Found user check P/W
     if (bcrypt.compareSync(req.body.password, user.password)) {
       req.session.user_id = user.id;
-      res.redirect("/urls"); //maybe use 'back' here
+      res.redirect("/urls"); 
     // Pw don't match
     } else {
       return res.status(400).send("Error: Password doesn't match");

@@ -120,8 +120,8 @@ describe("Get /urls/:id route tests", () => {
     const agent = chai.request.agent("http://localhost:8080");
     return agent
       .get("/urls/i3BoGr").then((accessRes) => {
-        // Step 3: Expect the status code to be 403
-        expect(accessRes).to.have.status(403);
+        // Step 3: Expect the status code to be 401
+        expect(accessRes).to.have.status(401);
       });
   });
 });
