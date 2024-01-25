@@ -12,11 +12,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser({
   name: 'session',
-  keys: ["12345679"],
+  keys: ["12345679"], // Should be secret in a real app
   maxAge: 24 * 60 * 60 * 1000, // 24 hours
-  secure: false,
-  httpOnly: true, 
-  sameSite: 'strict',
 }));
 
 // Variable Declarations (Instead of a database)
@@ -212,7 +209,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
   // if not your URL no delete
   if (urlDatabase[req.params.id].userID !== userID) {
-    return res.status(401).send("Cannot delete links that don't belong to you");
+    return res.status(403).send("Cannot delete links that don't belong to you");
   }
   
   delete urlDatabase[req.params.id];
@@ -233,11 +230,11 @@ app.post("/login", (req, res) => {
       res.redirect("/urls"); //maybe use 'back' here
     // Pw don't match
     } else {
-      return res.status(403).send("Error: Password doesn't match");
+      return res.status(400).send("Error: Password doesn't match");
     }
   // No user found error
   } else {
-    return res.status(403).send("Error: That user email was not found");
+    return res.status(400).send("Error: That user email was not found");
   }
 });
 

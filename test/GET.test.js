@@ -11,13 +11,13 @@ describe("Get / route tests", () => {
       //Step 1 login with real ID
       .post("/login")
       .send({ email: "user@example.com", password: "pass" })
-      .then((loginRes) => {
+      .then(() => {
         //Step 2: expect the be redirected to /urls from /
         return agent.get("/")
-        .then((redirRes) => {
-          expect(redirRes).to.redirect;
-          expect(redirRes).to.redirectTo("http://localhost:8080/urls");
-        })
+          .then((redirRes) => {
+            expect(redirRes).to.redirect;
+            expect(redirRes).to.redirectTo("http://localhost:8080/urls");
+          });
       });
   });
   it('should redirect from / to /login if not logged in', () => {
@@ -28,7 +28,7 @@ describe("Get / route tests", () => {
       .then((redirRes) => {
         expect(redirRes).to.redirect;
         expect(redirRes).to.redirectTo("http://localhost:8080/login");
-      })
+      });
   });
 });
 
@@ -39,12 +39,12 @@ describe("Get /urls route tests", () => {
       //Step 1 login with real ID
       .post("/login")
       .send({ email: "user@example.com", password: "pass" })
-      .then((loginRes) => {
+      .then(() => {
         //Step 2: expect the be sucess
         return agent.get("/urls")
-        .then((accessRes) => {
-          expect(accessRes).to.have.status(200);
-        })
+          .then((accessRes) => {
+            expect(accessRes).to.have.status(200);
+          });
       });
   });
   it('if NOT logged in get request to valid urls/:id get error 403 ', () => {
@@ -54,7 +54,7 @@ describe("Get /urls route tests", () => {
       .get("/urls")
       .then((accessRes) => {
         expect(accessRes).to.have.status(403);
-      })
+      });
   });
 });
 
@@ -67,7 +67,7 @@ describe("Get /urls/new route tests", () => {
       .then((redirRes) => {
         expect(redirRes).to.redirect;
         expect(redirRes).to.redirectTo("http://localhost:8080/login");
-      })
+      });
   });
 });
 
@@ -78,7 +78,7 @@ describe("Get /urls/:id route tests", () => {
     return agent
       .post("/login")
       .send({ email: "user@example.com", password: "pass" })
-      .then((loginRes) => {
+      .then(() => {
         // Step 2: Make a GET request to a protected resource
         return agent.get("/urls/i3BoGr").then((accessRes) => {
           // Step 3: Expect the status code to be sucess we own it
@@ -93,7 +93,7 @@ describe("Get /urls/:id route tests", () => {
     return agent
       .post("/login")
       .send({ email: "user@example.com", password: "pass" })
-      .then((loginRes) => {
+      .then(() => {
         // Step 2: Make a GET request to non real resouce
         return agent.get("/urls/madeup").then((accessRes) => {
           expect(accessRes).to.have.status(400);
@@ -107,7 +107,7 @@ describe("Get /urls/:id route tests", () => {
     return agent
       .post("/login")
       .send({ email: "user@example.com", password: "pass" })
-      .then((loginRes) => {
+      .then(() => {
         // Step 2: Make a GET request to a protected resource
         return agent.get("/urls/i3Bodd").then((accessRes) => {
           // Step 3: Expect the status code to be 403
@@ -119,11 +119,11 @@ describe("Get /urls/:id route tests", () => {
   it('should return 401 status code if not logged in for "http://localhost:8080/urls/i3BoGr"', () => {
     const agent = chai.request.agent("http://localhost:8080");
     return agent
-        .get("/urls/i3BoGr").then((accessRes) => {
-          // Step 3: Expect the status code to be 403
-          expect(accessRes).to.have.status(403);
-        });
+      .get("/urls/i3BoGr").then((accessRes) => {
+        // Step 3: Expect the status code to be 403
+        expect(accessRes).to.have.status(403);
       });
+  });
 });
 
 describe("Get /u/:id route tests", () => {
@@ -134,16 +134,16 @@ describe("Get /u/:id route tests", () => {
       .get("/u/i3BoGr").then((accessRes) => {
         expect(accessRes).to.have.status(200);
       });
-    });
+  });
 
-    it('should return 400 status code for non real link "http://localhost:8080/u/madeup"', () => {
+  it('should return 400 status code for non real link "http://localhost:8080/u/madeup"', () => {
     const agent = chai.request.agent("http://localhost:8080");
     return agent
       //Expect this to not exist in DB
       .get("/u/madeup").then((accessRes) => {
         expect(accessRes).to.have.status(400);
       });
-    });
+  });
 });
 
 describe("Get /login route tests", () => {
@@ -153,14 +153,14 @@ describe("Get /login route tests", () => {
     return agent
       .post("/login")
       .send({ email: "user@example.com", password: "pass" })
-      .then((loginRes) => {
+      .then(() => {
         // Step 2: Make a GET request to login expect redirected
         return agent.get("/login").then((redirRes) => {
           expect(redirRes).to.redirect;
           expect(redirRes).to.redirectTo("http://localhost:8080/urls");
         });
       });
-    });
+  });
 });
 
 describe("Get /register route tests", () => {
@@ -170,12 +170,12 @@ describe("Get /register route tests", () => {
     return agent
       .post("/login")
       .send({ email: "user@example.com", password: "pass" })
-      .then((loginRes) => {
+      .then(() => {
         // Step 2: Make a GET request to register expect redirected
         return agent.get("/register").then((redirRes) => {
           expect(redirRes).to.redirect;
           expect(redirRes).to.redirectTo("http://localhost:8080/urls");
         });
       });
-    });
+  });
 });

@@ -7,7 +7,7 @@ chai.use(chaiHttp);
 describe("Login and Access Control Test", () => {
    
 
-  // Behavior 1. 
+  // Behavior 1.
   it('should redirect to login with a status code of 302 for unauthorized access to "http://localhost:38080/"', () => {
     const agent = chai.request.agent("http://localhost:8080");
     return agent
@@ -29,6 +29,7 @@ describe("Login and Access Control Test", () => {
       });
   });
 
+  // Commented out because conflicting instructions If you access valid page with ID while not logged in. No redirect just error message
   // // Behavior 3
   // it('should redirect to login with a status code of 302 for unauthorized access to "http://localhost:8080/urls/b2xVn2"', () => {
   //   const agent = chai.request.agent("http://localhost:8080");
@@ -46,7 +47,7 @@ describe("Login and Access Control Test", () => {
     return agent
       .post("/login")
       .send({ email: "user@example.com", password: "pass" })
-      .then((loginRes) => {
+      .then(() => {
         return agent.get("/urls/madeup").then((accessRes) => {
           expect(accessRes).to.have.status(400);
         });
@@ -61,7 +62,7 @@ describe("Login and Access Control Test", () => {
     return agent
       .post("/login")
       .send({ email: "user@example.com", password: "pass" })
-      .then((loginRes) => {
+      .then(() => {
         // Step 2: Make a GET request to a protected resource
         return agent.get("/urls/i3Bodd").then((accessRes) => {
           // Step 3: Expect the status code to be 403
@@ -77,7 +78,7 @@ describe("Login and Access Control Test", () => {
     return agent
       .post("/login")
       .send({ email: "user@example.com", password: "pass" })
-      .then((loginRes) => {
+      .then(() => {
         // Step 2: Make a GET request to a protected resource
         return agent.get("/urls/i3BoGr").then((accessRes) => {
           // Step 3: Expect the status code to be 403
