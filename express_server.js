@@ -64,9 +64,9 @@ app.get("/", (req, res) => {
 app.get("/urls", (req, res) => {
   let userID = req.session.user_id;
 
-  // If not logged in redirect to login
+  // If not logged in relevant error
   if (!users[userID]) {
-    return res.redirect("/login");
+    return res.status(403).send("Must be logged in to view URLs");
   }
 
   let passDatabase = urlDatabase;
@@ -98,9 +98,10 @@ app.get("/urls/new", (req, res) => {
 // Page for unique shortened URLS
 app.get("/urls/:id", (req, res) => {
   let userID = req.session.user_id;
-  // If not logged in redirect
+
+  // If not logged in foribidden access error
   if (!users[userID]) {
-    return res.redirect("/login");
+    return res.status(403).send("Must be logged in to access unique Urls");
   }
 
   // if that URL doesn't exists in DB.
