@@ -22,15 +22,18 @@ app.use(methodOverride('_method'))
 let urlDatabase = {
   b2xVn2: {
     longURL: "http://www.lighthouselabs.ca",
-    userID: "123456"
+    userID: "123456",
+    totalVis: 0,
   },
   i3BoGr: {
     longURL: "http://www.google.com",
-    userID: "123456"
+    userID: "123456",
+    totalVis: 0,
   },
   i3Bodd: {
     longURL: "http://www.google.com",
-    userID: "user2RandomID"
+    userID: "user2RandomID",
+    totalVis: 0,
   },
 };
 // Users with some pre-populated example
@@ -74,7 +77,8 @@ app.get("/urls", (req, res) => {
     passDatabase = urlsForUser(userID, urlDatabase);
   }
 
-  const templateVars = { urls: passDatabase,
+  const templateVars = { 
+    urls: passDatabase,
     user: users[userID]
   };
   res.render("urls_index", templateVars);
@@ -116,6 +120,7 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
     user: users[userID],
+    totalVis: urlDatabase[req.params.id].totalVis
   };
   return res.render("urls_show", templateVars);
 });
@@ -153,6 +158,8 @@ app.get("/u/:id", (req, res) => {
   if (!urlDatabase[req.params.id]) {
     return res.status(400).send("Not Found: The specified redirect URL does not exist in the database.");
   }
+  // Increment total visits when shortlink used
+  urlDatabase[req.params.id].totalVis += 1;
   res.redirect(urlDatabase[req.params.id].longURL);
 });
 
@@ -168,7 +175,8 @@ app.post("/urls", (req, res) => {
   let sixString = generateRandomString();
   urlDatabase[sixString] = {
     longURL: req.body.longURL,
-    userID: userID
+    userID: userID,
+    totalVis: 0
   };
   return res.redirect(`/urls/${sixString}`);
 });
