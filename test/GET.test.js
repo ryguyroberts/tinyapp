@@ -51,6 +51,7 @@ describe("Get /urls route tests", () => {
 
       });
   });
+  // Don't test this for now - Get request to delete resource
   // it('if logged in post request to valid urls/:id/delete is success', () => {
   //   const agent = chai.request.agent("http://localhost:8080");
   //   return agent
