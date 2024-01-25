@@ -21,4 +21,9 @@ describe('getUserByEmail', function() {
     const expectedUserID = "userRandomID";
     assert.strictEqual(user.id, expectedUserID);
   });
+
+  it('should return null if email isnt valid', function() {
+    const user = findUserByEmail("notrealemail@example.com", testUsers)
+    assert.isNull(user);
+  });
 });
