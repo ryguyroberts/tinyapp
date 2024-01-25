@@ -53,6 +53,7 @@ let users = {
 // Some functions that will exist here for now
 
 // Generate 6digit id
+// Move to own file soon.
 const generateRandomString = () => {
   // Might be a better way but this works.
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -65,6 +66,7 @@ const generateRandomString = () => {
 };
 
 // Returns an Object of ONLY the urls belonging to specific user ID
+// Move to own file soon
 const urlsForUser = (ID) => {
   let keyArr = Object.keys(urlDatabase);
   let returnObj = {};
