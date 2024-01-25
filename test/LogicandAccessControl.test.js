@@ -29,7 +29,7 @@ describe("Login and Access Control Test", () => {
       });
   });
 
-  // Commented out because conflicting instructions If you access valid page with ID while not logged in. No redirect just error message
+  // Commented out because conflicting instructions If you access valid page with ID while not logged in. Not redirect just error message
   // // Behavior 3
   // it('should redirect to login with a status code of 302 for unauthorized access to "http://localhost:8080/urls/b2xVn2"', () => {
   //   const agent = chai.request.agent("http://localhost:8080");

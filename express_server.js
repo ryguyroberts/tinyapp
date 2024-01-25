@@ -146,7 +146,6 @@ app.get("/login", (req, res) => {
 });
 
 // Redirect if u/shorturl (Only things in "DB" of course)
-// Doing this weird?
 app.get("/u/:id", (req, res) => {
   // Check first if ID exists in urlDB if it exists.
   if (!urlDatabase[req.params.id]) {
@@ -191,7 +190,7 @@ app.post("/urls/:id", (req, res) => {
     return res.status(403).send("Cannot update links that don't belong to you");
   }
 
-  //Makes it hear updae the URL
+  //Makes it hear update the URL
   urlDatabase[req.params.id].longURL = req.body.longURL;
   res.redirect("/urls");
 

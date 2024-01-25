@@ -9,7 +9,7 @@ describe("Post /urls route tests", () => {
   it('should create a new URL in DB var and redirect to its unique page if logged in', () => {
     const agent = chai.request.agent("http://localhost:8080");
     return agent
-      //Step 1 login with real ID
+      //login with real ID
       .post("/login")
       .send({ email: "user@example.com", password: "pass" })
       .then(() => {
@@ -38,7 +38,7 @@ describe("Post /urls/:id route tests", () => {
   it('should update the id for the URL if logged in and belongs to user', () => {
     const agent = chai.request.agent("http://localhost:8080");
     return agent
-      //Step 1 login with real ID
+      //login with real ID
       .post("/login")
       .send({ email: "user@example.com", password: "pass" })
       .then(() => {
@@ -66,7 +66,7 @@ describe("Post /urls/:id route tests", () => {
   it('should return error 403 if logged in but not your ID to update', () => {
     const agent = chai.request.agent("http://localhost:8080");
     return agent
-      //Step 1 login with real ID
+      //login with real ID
       .post("/login")
       .send({ email: "user@example.com", password: "pass" })
       .then(() => {
@@ -96,7 +96,7 @@ describe("Post /urls/:id/delete route tests", () => {
   it('should return error 403 if logged in but not your ID to delete', () => {
     const agent = chai.request.agent("http://localhost:8080");
     return agent
-      //Step 1 login with real ID
+      //login with real ID
       .post("/login")
       .send({ email: "user@example.com", password: "pass" })
       .then(() => {
@@ -114,7 +114,7 @@ describe("Post /login route tests", () => {
   it('should redirect to urls if logged in with correct creds', () => {
     const agent = chai.request.agent("http://localhost:8080");
     return agent
-      //Step 1 login with real ID
+      //login with real ID
       .post("/login")
       .send({ email: "user@example.com", password: "pass" })
       .then((loginRes) => {
@@ -127,7 +127,7 @@ describe("Post /login route tests", () => {
   it('if it doesnt match a user email expect error 400', () => {
     const agent = chai.request.agent("http://localhost:8080");
     return agent
-      //Step 1 login with real ID
+      //login with real ID
       .post("/login")
       .send({ email: "madeupuser.com", password: "pass" })
       .then((loginRes) => {
@@ -139,7 +139,7 @@ describe("Post /login route tests", () => {
   it('if it doesnt match a user pass expect error 400', () => {
     const agent = chai.request.agent("http://localhost:8080");
     return agent
-      //Step 1 login with real ID
+      //login with real ID
       .post("/login")
       // real user bad pass
       .send({ email: "user@example.com", password: "badpass" })
@@ -155,7 +155,7 @@ describe("Post /register route tests", () => {
   it('If email empty return error 400', () => {
     const agent = chai.request.agent("http://localhost:8080");
     return agent
-      //Step 1 register with valid pass no email
+      //register with valid pass no email
       .post("/register")
       .send({ email: "  ", password: "pass" })
       .then((loginRes) => {
@@ -166,7 +166,7 @@ describe("Post /register route tests", () => {
   it('If password empty return error 400', () => {
     const agent = chai.request.agent("http://localhost:8080");
     return agent
-      //Step 1 register with valid email no pass
+      //register with valid email no pass
       .post("/register")
       .send({ email: "newuser@email.com", password: "  " })
       .then((loginRes) => {
@@ -177,7 +177,7 @@ describe("Post /register route tests", () => {
   it('If email taken expect error 400', () => {
     const agent = chai.request.agent("http://localhost:8080");
     return agent
-      //Step 1 login with real ID
+      //login with real ID
       .post("/register")
       .send({ email: "user@example.com", password: "pass" })
       .then((loginRes) => {
