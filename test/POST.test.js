@@ -33,3 +33,53 @@ describe("Post /urls route tests", () => {
   });
 });
 
+
+describe("Post /urls/:id route tests", () => {
+  it('should update the id for the URL if logged in and belongs to user', () => {
+    const agent = chai.request.agent("http://localhost:8080");
+    return agent
+      //Step 1 login with real ID
+      .post("/login")
+      .send({ email: "user@example.com", password: "pass" })
+      .then((loginRes) => {
+        //Post to valid ID which is owned by logged in user
+        return agent.post("/urls/b2xVn2")
+        .send({ longURL: "www.wowhead.com"})
+        .then((redirRes) => {
+          expect(redirRes).to.redirect;
+          expect(redirRes).to.redirectTo("http://localhost:8080/urls");
+        })
+      });
+    });
+
+  it('Should return error 401 if not logged in trying to update a URL', () => {
+    const agent = chai.request.agent("http://localhost:8080");
+
+        //Post to valid ID which is owned by logged in user
+        return agent.post("/urls/b2xVn2")
+        .send({ longURL: "www.wowhead.com"})
+        .then((accessRes) => {
+          expect(accessRes).to.have.status(401);
+        })
+      });
+    
+
+  // If logged in and not the owner relevant error 403
+  it('should return error 403 if logged in but not your ID to update', () => {
+    const agent = chai.request.agent("http://localhost:8080");
+    return agent
+      //Step 1 login with real ID
+      .post("/login")
+      .send({ email: "user@example.com", password: "pass" })
+      .then((loginRes) => {
+        //Post to valid ID which is NOT owned by logged in user
+        return agent.post("/urls/i3Bodd")
+        .send({ longURL: "www.wowhead.com"})
+        .then((accessRes) => {
+          expect(accessRes).to.have.status(403);
+        })
+      });
+    });
+});
+
+
