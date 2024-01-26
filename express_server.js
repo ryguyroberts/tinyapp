@@ -179,17 +179,18 @@ app.get("/u/:id", (req, res) => {
   urlDatabase[req.params.id].totalVis += 1;
 
   // Logic for unique users (independent of login)
+
   //Check for unique cookie if not make one and increment specific URL.
-  let isUnique = req.session.unique;
-  if (!isUnique) {
+  let uniqueCookie = req.session.unique;
+  if (!uniqueCookie) {
     let visID = generateRandomString();
     req.session.unique = visID;
     //Increment URLs data base of uniqueVis and add to global visitor list.
     urlDatabase[req.params.id].uniqueVis += 1;
     visitors[visID] = [req.params.id];
   }
+  
   let visID = req.session.unique;
-
   // Since DB goes away. If we have a visitor who doesnt exist in DB but has the right cookie make them quick
   if (!visitors[visID]) {
     visitors[visID] = [req.params.id];
