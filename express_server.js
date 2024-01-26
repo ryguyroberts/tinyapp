@@ -260,7 +260,7 @@ app.put("/urls/:id", (req, res) => {
     return res.status(403).send("Cannot update links that don't belong to you");
   }
 
-  //Makes it hear update the URL
+  //Makes it here update the URL
   urlDatabase[req.params.id].longURL = req.body.longURL;
   res.redirect("/urls");
 
@@ -315,6 +315,7 @@ app.post("/login", (req, res) => {
 
 // Catch post logout and remove cookie for username
 app.delete("/logout", (req, res) => {
+  // Specific cookie, cause I don't want to clear uniqueuser Cookie
   req.session.userId = null;
   res.redirect("/login");
 });
@@ -339,7 +340,7 @@ app.post("/register", (req, res) => {
     password: bcrypt.hashSync(req.body.password, 10)
   };
   req.session.userId = id;
-  res.redirect("/urls"); //maybe use 'back' here eventually
+  res.redirect("/urls");
 });
 
 

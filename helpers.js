@@ -10,7 +10,6 @@ const findUserByEmail = (email , database) => {
 
 //generate a random 6 character string
 const generateRandomString = () => {
-  // Might be a better way but this works.
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let randomString = "";
   for (let i = 0; i < 6; i++) {
