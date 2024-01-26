@@ -24,16 +24,19 @@ let urlDatabase = {
     longURL: "http://www.lighthouselabs.ca",
     userID: "123456",
     totalVis: 0,
+    uniqueVis: 0
   },
   i3BoGr: {
     longURL: "http://www.google.com",
     userID: "123456",
     totalVis: 0,
+    uniqueVis: 0
   },
   i3Bodd: {
     longURL: "http://www.google.com",
     userID: "user2RandomID",
     totalVis: 0,
+    uniqueVis: 0
   },
 };
 // Users with some pre-populated example
@@ -50,6 +53,9 @@ let users = {
     password: bcrypt.hashSync("pass", 10),
   },
 };
+
+// UniqueVistors
+let visitors = {};
 
 // GET routes
 
@@ -120,7 +126,8 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
     user: users[userID],
-    totalVis: urlDatabase[req.params.id].totalVis
+    totalVis: urlDatabase[req.params.id].totalVis,
+    uniqueVis: urlDatabase[req.params.id].uniqueVis
   };
   return res.render("urls_show", templateVars);
 });
@@ -154,12 +161,36 @@ app.get("/login", (req, res) => {
 
 // Redirect if u/shorturl (Only things in "DB" of course)
 app.get("/u/:id", (req, res) => {
-  // Check first if ID exists in urlDB if it exists.
+  // Check first if ID exists in urlDB
   if (!urlDatabase[req.params.id]) {
     return res.status(400).send("Not Found: The specified redirect URL does not exist in the database.");
   }
-  // Increment total visits when shortlink used
+
+  // Increment total visits when shortlink used everytime
   urlDatabase[req.params.id].totalVis += 1;
+
+  // Logic for unique users (independent of login)
+  //Check for unique cookie if not make one and increment specific URL.
+  let isUnique = req.session.unique;
+  if(!isUnique) {
+    let visID = generateRandomString();
+    req.session.unique = visID;
+    //Increment URLs data base of uniqueVis and add to global visitor list. 
+    urlDatabase[req.params.id].uniqueVis += 1;
+    visitors[visID] = [req.params.id]
+  }
+  // if they've already visited once and have cookie check the array before increment.
+  let visID = req.session.unique;
+  // Error Bug check here because of non persistant DB related error.
+  if (!visitors[visID]) {
+    return res.status(400).send("You have a visitor ID cookie, but not in Global Visitor DB. Error happens because of non persitant DB. Reset cookies");
+  }
+  let idFound = visitors[visID].find(urlID => urlID === req.params.id)
+  if (!idFound) {
+    urlDatabase[req.params.id].uniqueVis += 1;
+    visitors[visID].push(req.params.id);
+  }
+
   res.redirect(urlDatabase[req.params.id].longURL);
 });
 
@@ -176,7 +207,8 @@ app.post("/urls", (req, res) => {
   urlDatabase[sixString] = {
     longURL: req.body.longURL,
     userID: userID,
-    totalVis: 0
+    totalVis: 0,
+    uniqueVis: 0
   };
   return res.redirect(`/urls/${sixString}`);
 });
@@ -237,9 +269,11 @@ app.post("/login", (req, res) => {
   //Lookup object in DB
   let user = findUserByEmail(req.body.email, users);
   if (user) {
+    id = user.id
     // Found user check P/W
     if (bcrypt.compareSync(req.body.password, user.password)) {
-      req.session.user_id = user.id;
+      //Set user cookie & redirect
+      req.session.user_id = id 
       res.redirect("/urls"); 
     // Pw don't match
     } else {
@@ -253,7 +287,7 @@ app.post("/login", (req, res) => {
 
 // Catch post logout and remove cookie for username
 app.delete("/logout", (req, res) => {
-  req.session = null;
+  req.session.user_id = null;
   res.redirect("/login");
 });
 

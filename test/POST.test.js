@@ -43,7 +43,7 @@ describe("Post /urls/:id route tests", () => {
       .send({ email: "user@example.com", password: "pass" })
       .then(() => {
         //Post to valid ID which is owned by logged in user
-        return agent.post("/urls/b2xVn2")
+        return agent.put("/urls/b2xVn2")
           .send({ longURL: "www.wowhead.com"})
           .then((redirRes) => {
             expect(redirRes).to.redirect;
@@ -55,7 +55,7 @@ describe("Post /urls/:id route tests", () => {
   it('Should return error 401 if not logged in trying to update a URL', () => {
     const agent = chai.request.agent("http://localhost:8080");
     //Post to valid ID but not logged in
-    return agent.post("/urls/b2xVn2")
+    return agent.put("/urls/b2xVn2")
       .send({ longURL: "www.wowhead.com"})
       .then((accessRes) => {
         expect(accessRes).to.have.status(401);
@@ -71,7 +71,7 @@ describe("Post /urls/:id route tests", () => {
       .send({ email: "user@example.com", password: "pass" })
       .then(() => {
         //Post to valid ID which is NOT owned by logged in user
-        return agent.post("/urls/i3Bodd")
+        return agent.put("/urls/i3Bodd")
           .send({ longURL: "www.wowhead.com"})
           .then((accessRes) => {
             expect(accessRes).to.have.status(403);
@@ -86,7 +86,7 @@ describe("Post /urls/:id/delete route tests", () => {
   it('Should return error 401 if not logged in trying to delete a URL', () => {
     const agent = chai.request.agent("http://localhost:8080");
     // Post to valid ID but no login.
-    return agent.post("/urls/b2xVn2/delete")
+    return agent.delete("/urls/b2xVn2/delete")
       .then((accessRes) => {
         expect(accessRes).to.have.status(401);
       });
@@ -101,7 +101,7 @@ describe("Post /urls/:id/delete route tests", () => {
       .send({ email: "user@example.com", password: "pass" })
       .then(() => {
         //Post to valid ID which is NOT owned by logged in user
-        return agent.post("/urls/i3Bodd/delete")
+        return agent.delete("/urls/i3Bodd/delete")
           .then((accessRes) => {
             expect(accessRes).to.have.status(403);
           });
