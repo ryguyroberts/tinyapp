@@ -211,7 +211,7 @@ app.get("/u/:id", (req, res) => {
   }
 
   // If the link has been visited but not by this user add user ID.
-  if (!urlVisits[req.params.id][visID]){
+  if (!urlVisits[req.params.id][visID]) {
     urlVisits[req.params.id][visID] = [];
   }
 
