@@ -27,15 +27,32 @@ const urlsForUser = (ID, Database) => {
   keyArr.forEach(key => {
     if (Database[key].userID === ID) {
       returnObj[key] = {
-        longURL: Database[key].longURL
+        longURL: Database[key].longURL,
+        totalVis: Database[key].totalVis,
+        uniqueVis: Database[key].uniqueVis,
+        created: Database[key].created
       };
     }
   });
   return returnObj;
 };
 
+// Returns a string with formatted date/time
+const currentTime = () => {
+  let currentdate = new Date(); 
+  let datetime = currentdate.getDate() + "/"
+    + (currentdate.getMonth()+1)  + "/" 
+    + currentdate.getFullYear() + " @ "  
+    + currentdate.getHours() + ":"  
+    + currentdate.getMinutes() + ":" 
+    + currentdate.getSeconds();
+    return datetime;
+
+}
+
 module.exports = { 
   findUserByEmail,
   generateRandomString,
   urlsForUser,
+  currentTime,
  };

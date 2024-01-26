@@ -4,7 +4,7 @@ const app = express();
 const cookieParser = require('cookie-session');
 const PORT = 8080; // default port 8080
 const bcrypt = require("bcryptjs");
-const { findUserByEmail, generateRandomString, urlsForUser } = require("./helpers");
+const { findUserByEmail, generateRandomString, urlsForUser, currentTime } = require("./helpers");
 
 
 // Config
@@ -24,19 +24,22 @@ let urlDatabase = {
     longURL: "http://www.lighthouselabs.ca",
     userID: "123456",
     totalVis: 0,
-    uniqueVis: 0
+    uniqueVis: 0,
+    created: currentTime()
   },
   i3BoGr: {
     longURL: "http://www.google.com",
     userID: "123456",
     totalVis: 0,
-    uniqueVis: 0
+    uniqueVis: 0,
+    created: currentTime()
   },
   i3Bodd: {
     longURL: "http://www.google.com",
     userID: "user2RandomID",
     totalVis: 0,
-    uniqueVis: 0
+    uniqueVis: 0,
+    created: currentTime()
   },
 };
 // Users with some pre-populated example
@@ -85,7 +88,7 @@ app.get("/urls", (req, res) => {
 
   const templateVars = { 
     urls: passDatabase,
-    user: users[userID]
+    user: users[userID],
   };
   res.render("urls_index", templateVars);
 });
@@ -127,7 +130,8 @@ app.get("/urls/:id", (req, res) => {
     longURL: urlDatabase[req.params.id].longURL,
     user: users[userID],
     totalVis: urlDatabase[req.params.id].totalVis,
-    uniqueVis: urlDatabase[req.params.id].uniqueVis
+    uniqueVis: urlDatabase[req.params.id].uniqueVis,
+    created: urlDatabase[req.params.id].created,
   };
   return res.render("urls_show", templateVars);
 });
@@ -179,12 +183,15 @@ app.get("/u/:id", (req, res) => {
     urlDatabase[req.params.id].uniqueVis += 1;
     visitors[visID] = [req.params.id]
   }
-  // if they've already visited once and have cookie check the array before increment.
-  let visID = req.session.unique;
-  // Error Bug check here because of non persistant DB related error.
+    let visID = req.session.unique;
+
+  // Since DB goes away. If we have a visitor who doesnt exist in DB but has the right cookie make them quick
   if (!visitors[visID]) {
-    return res.status(400).send("You have a visitor ID cookie, but not in Global Visitor DB. Error happens because of non persitant DB. Reset cookies");
+    visitors[visID] = [req.params.id]
+    urlDatabase[req.params.id].uniqueVis += 1;
   }
+
+  // User exists check if they've accessed it before, if not unique add.
   let idFound = visitors[visID].find(urlID => urlID === req.params.id)
   if (!idFound) {
     urlDatabase[req.params.id].uniqueVis += 1;
@@ -208,7 +215,8 @@ app.post("/urls", (req, res) => {
     longURL: req.body.longURL,
     userID: userID,
     totalVis: 0,
-    uniqueVis: 0
+    uniqueVis: 0,
+    created: currentTime()
   };
   return res.redirect(`/urls/${sixString}`);
 });
