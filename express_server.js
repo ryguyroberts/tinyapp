@@ -57,8 +57,11 @@ let users = {
   },
 };
 
-// UniqueVistors
+// UniqueVistors DB
 let visitors = {};
+
+//Url visits DB
+let urlVisits = {};
 
 // GET routes
 
@@ -126,7 +129,9 @@ app.get("/urls/:id", (req, res) => {
     return res.status(403).send("Cannot access links that don't belong to you");
   }
 
-  const templateVars = { id: req.params.id,
+  const templateVars = {
+    urlVisits: urlVisits,
+    id: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
     user: users[userID],
     totalVis: urlDatabase[req.params.id].totalVis,
@@ -197,6 +202,21 @@ app.get("/u/:id", (req, res) => {
     urlDatabase[req.params.id].uniqueVis += 1;
     visitors[visID].push(req.params.id);
   }
+
+  // Tracking visit times
+  let time = currentTime();
+  // If link has never been visited create object with url ID
+  if (!urlVisits[req.params.id]) {
+    urlVisits[req.params.id] = {};
+  }
+
+  // If the link has been visited but not by this user add user ID.
+  if (!urlVisits[req.params.id][visID]){
+    urlVisits[req.params.id][visID] = [];
+  }
+
+  // If link has been visited and been there before push the time.
+  urlVisits[req.params.id][visID].push(time);
 
   res.redirect(urlDatabase[req.params.id].longURL);
 });
