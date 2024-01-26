@@ -1,5 +1,5 @@
 const express = require("express");
-const methodOverride = require('method-override')
+const methodOverride = require('method-override');
 const app = express();
 const cookieParser = require('cookie-session');
 const PORT = 8080; // default port 8080
@@ -16,7 +16,7 @@ app.use(cookieParser({
   keys: ["12345679"], // Should be secret in a real app
   maxAge: 24 * 60 * 60 * 1000, // 24 hours
 }));
-app.use(methodOverride('_method'))
+app.use(methodOverride('_method'));
 
 // Variable Declarations (Instead of a database)
 let urlDatabase = {
@@ -64,7 +64,7 @@ let visitors = {};
 
 // If on root/ Not logged in goes to login
 app.get("/", (req, res) => {
-  let userID = req.session.user_id;
+  let userID = req.session.userId;
   if (users[userID]) {
     return res.redirect("/urls");
   }
@@ -73,7 +73,7 @@ app.get("/", (req, res) => {
 
 // Page of all URLS
 app.get("/urls", (req, res) => {
-  let userID = req.session.user_id;
+  let userID = req.session.userId;
 
   // If not logged in relevant error
   if (!users[userID]) {
@@ -86,7 +86,7 @@ app.get("/urls", (req, res) => {
     passDatabase = urlsForUser(userID, urlDatabase);
   }
 
-  const templateVars = { 
+  const templateVars = {
     urls: passDatabase,
     user: users[userID],
   };
@@ -95,7 +95,7 @@ app.get("/urls", (req, res) => {
 
 // Page to make new URLS
 app.get("/urls/new", (req, res) => {
-  let userID = req.session.user_id;
+  let userID = req.session.userId;
   //Not logged in get out!
   if (!users[userID]) {
     return res.redirect("/login");
@@ -109,7 +109,7 @@ app.get("/urls/new", (req, res) => {
 
 // Page for unique shortened URLS
 app.get("/urls/:id", (req, res) => {
-  let userID = req.session.user_id;
+  let userID = req.session.userId;
 
   // If not logged in foribidden access error
   if (!users[userID]) {
@@ -138,7 +138,7 @@ app.get("/urls/:id", (req, res) => {
 
 // Page for registration
 app.get("/register", (req, res) => {
-  let userID = req.session.user_id;
+  let userID = req.session.userId;
 
   // redirect to URL if logged in And user exists in DB
   if (users[userID]) {
@@ -152,7 +152,7 @@ app.get("/register", (req, res) => {
 
 // Page for login
 app.get("/login", (req, res) => {
-  let userID = req.session.user_id;
+  let userID = req.session.userId;
   // redirect to URL if logged in And user exists in DB
   if (users[userID]) {
     return res.redirect("/urls");
@@ -176,23 +176,23 @@ app.get("/u/:id", (req, res) => {
   // Logic for unique users (independent of login)
   //Check for unique cookie if not make one and increment specific URL.
   let isUnique = req.session.unique;
-  if(!isUnique) {
+  if (!isUnique) {
     let visID = generateRandomString();
     req.session.unique = visID;
-    //Increment URLs data base of uniqueVis and add to global visitor list. 
+    //Increment URLs data base of uniqueVis and add to global visitor list.
     urlDatabase[req.params.id].uniqueVis += 1;
-    visitors[visID] = [req.params.id]
+    visitors[visID] = [req.params.id];
   }
-    let visID = req.session.unique;
+  let visID = req.session.unique;
 
   // Since DB goes away. If we have a visitor who doesnt exist in DB but has the right cookie make them quick
   if (!visitors[visID]) {
-    visitors[visID] = [req.params.id]
+    visitors[visID] = [req.params.id];
     urlDatabase[req.params.id].uniqueVis += 1;
   }
 
   // User exists check if they've accessed it before, if not unique add.
-  let idFound = visitors[visID].find(urlID => urlID === req.params.id)
+  let idFound = visitors[visID].find(urlID => urlID === req.params.id);
   if (!idFound) {
     urlDatabase[req.params.id].uniqueVis += 1;
     visitors[visID].push(req.params.id);
@@ -205,7 +205,7 @@ app.get("/u/:id", (req, res) => {
 
 //Catch new URLs being created generate random 6 digit for ID
 app.post("/urls", (req, res) => {
-  let userID = req.session.user_id;
+  let userID = req.session.userId;
   // If not logged in can't make new URLS!
   if (!users[userID]) {
     return res.status(401).send("You cannot add a new URL unless you are logged in");
@@ -223,7 +223,7 @@ app.post("/urls", (req, res) => {
 
 //Catch post and update the requested URL long value
 app.put("/urls/:id", (req, res) => {
-  let userID = req.session.user_id;
+  let userID = req.session.userId;
   
   // if not logged in no dice
   if (!users[userID]) {
@@ -248,7 +248,7 @@ app.put("/urls/:id", (req, res) => {
 
 //Catch post and delete the requested URL ID
 app.delete("/urls/:id/delete", (req, res) => {
-  let userID = req.session.user_id;
+  let userID = req.session.userId;
 
   // if not logged in no dice
   if (!users[userID]) {
@@ -277,12 +277,12 @@ app.post("/login", (req, res) => {
   //Lookup object in DB
   let user = findUserByEmail(req.body.email, users);
   if (user) {
-    id = user.id
+    let id = user.id;
     // Found user check P/W
     if (bcrypt.compareSync(req.body.password, user.password)) {
       //Set user cookie & redirect
-      req.session.user_id = id 
-      res.redirect("/urls"); 
+      req.session.userId = id;
+      res.redirect("/urls");
     // Pw don't match
     } else {
       return res.status(400).send("Error: Password doesn't match");
@@ -295,7 +295,7 @@ app.post("/login", (req, res) => {
 
 // Catch post logout and remove cookie for username
 app.delete("/logout", (req, res) => {
-  req.session.user_id = null;
+  req.session.userId = null;
   res.redirect("/login");
 });
 
@@ -318,7 +318,7 @@ app.post("/register", (req, res) => {
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, 10)
   };
-  req.session.user_id = id;
+  req.session.userId = id;
   res.redirect("/urls"); //maybe use 'back' here eventually
 });
 

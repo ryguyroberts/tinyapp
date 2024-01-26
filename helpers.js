@@ -39,20 +39,19 @@ const urlsForUser = (ID, Database) => {
 
 // Returns a string with formatted date/time
 const currentTime = () => {
-  let currentdate = new Date(); 
+  let currentdate = new Date();
   let datetime = currentdate.getDate() + "/"
-    + (currentdate.getMonth()+1)  + "/" 
-    + currentdate.getFullYear() + " @ "  
-    + currentdate.getHours() + ":"  
-    + currentdate.getMinutes() + ":" 
+    + (currentdate.getMonth() + 1)  + "/"
+    + currentdate.getFullYear() + " @ "
+    + currentdate.getHours() + ":"
+    + currentdate.getMinutes() + ":"
     + currentdate.getSeconds();
-    return datetime;
+  return datetime;
+};
 
-}
-
-module.exports = { 
+module.exports = {
   findUserByEmail,
   generateRandomString,
   urlsForUser,
   currentTime,
- };
+};
