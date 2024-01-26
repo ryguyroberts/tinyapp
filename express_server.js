@@ -2,7 +2,7 @@ const express = require("express");
 const methodOverride = require('method-override');
 const app = express();
 const cookieParser = require('cookie-session');
-const PORT = 8080; // default port 8080
+const PORT = 8080;
 const bcrypt = require("bcryptjs");
 const { findUserByEmail, generateRandomString, urlsForUser, currentTime } = require("./helpers");
 
@@ -57,15 +57,15 @@ let users = {
   },
 };
 
-// UniqueVistors DB
+// UniqueVistors DB - For tracking
 let visitors = {};
 
-//Url visits DB
+//Url visits DB - more intense tracking (Time, guest ID)
 let urlVisits = {};
 
 // GET routes
 
-// If on root/ Not logged in goes to login
+// If on root / Not logged in goes to login
 app.get("/", (req, res) => {
   let userID = req.session.userId;
   if (users[userID]) {
@@ -215,7 +215,7 @@ app.get("/u/:id", (req, res) => {
     urlVisits[req.params.id][visID] = [];
   }
 
-  // If link has been visited and been there before push the time.
+  // Makes it here and pushes the time
   urlVisits[req.params.id][visID].push(time);
 
   res.redirect(urlDatabase[req.params.id].longURL);
